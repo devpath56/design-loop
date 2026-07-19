@@ -1,0 +1,63 @@
+<!-- FIXTURE: rounded-lg (8px) radius used consistently across an otherwise well-composed, asymmetric page | GROUND TRUTH: GREY. design.md bans "rounded-lg everywhere" as a tell, but the phrase itself is doing double duty: is the problem the radius value being uniform, or is it that uniform-radius pages are usually ALSO centered, ALSO gridded into three cards, ALSO on a purple gradient — i.e. rounded-lg is a symptom that correlates with genericness rather than a cause of it in isolation? This page has a single 8px radius on every rounded element (button, image frame, callout box) but the layout itself is asymmetric (an off-center two-column editorial split), the color story is a single tinted neutral plus one accent used once, and there's no card grid, no gradient, no emoji. A sharp reviewer might say: the radius consistency here reads as a *system* (one radius token, applied everywhere it's needed) rather than a default nobody thought about. I genuinely go back and forth on this one — the letter of design.md says fail, the spirit of design.md (taste, considered choices) says this might be fine. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Harbor Notes — Shared reading for small teams</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; overflow-x: clip; }
+  body {
+    font-family: Georgia, "Iowan Old Style", serif;
+    color: #1c1917; background: #fafaf9; line-height: 1.65;
+  }
+  img, svg { max-width: 100%; height: auto; display: block; }
+  a:focus-visible, button:focus-visible { outline: 2px solid #1c1917; outline-offset: 2px; }
+  .layout {
+    max-width: 1000px; margin: 0 auto; padding: 96px 32px 64px;
+    display: grid; grid-template-columns: 2fr 3fr; gap: 56px;
+  }
+  @media (max-width: 720px) { .layout { grid-template-columns: 1fr; } }
+  .layout h1 { font-size: 2.1rem; margin: 0 0 4px; }
+  .layout .kicker { color: #78716c; font-size: 0.95rem; margin: 0 0 24px; font-style: italic; }
+  .layout p { max-width: 58ch; }
+  .callout {
+    background: #f1efe9; border-radius: 8px; padding: 24px; margin-top: 32px;
+  }
+  .callout p { margin: 0; font-size: 0.95rem; }
+  .image-frame { border-radius: 8px; overflow: hidden; margin-bottom: 24px; }
+  .btn {
+    display: inline-block; background: #1c1917; color: #fafaf9; border: none;
+    border-radius: 8px; padding: 12px 22px; font-family: inherit; font-size: 0.95rem;
+    text-decoration: none; margin-top: 16px;
+  }
+</style>
+</head>
+<body>
+  <div class="layout">
+    <div>
+      <h1>Harbor Notes</h1>
+      <p class="kicker">Shared reading for small teams</p>
+      <p>Every Friday, one member picks a chapter. The rest of the team reads it before the next Friday and leaves marginal notes — no scheduled call required.</p>
+      <a class="btn" href="#join">Join a reading circle</a>
+    </div>
+    <div>
+      <div class="image-frame">
+        <svg viewBox="0 0 560 260" role="img" aria-label="Illustration of an open book with three annotation marks in the margin">
+          <rect width="560" height="260" fill="#e7e4dc"/>
+          <rect x="80" y="40" width="180" height="180" fill="#fafaf9" stroke="#c9c3b5"/>
+          <rect x="300" y="40" width="180" height="180" fill="#fafaf9" stroke="#c9c3b5"/>
+          <circle cx="270" cy="90" r="5" fill="#9c8f6f"/>
+          <circle cx="270" cy="140" r="5" fill="#9c8f6f"/>
+          <circle cx="270" cy="190" r="5" fill="#9c8f6f"/>
+        </svg>
+      </div>
+      <p>There's no feed, no likes, no read receipts. Notes appear as marginalia next to the paragraph they respond to, the way they would in a shared physical copy.</p>
+      <div class="callout">
+        <p>Harbor Notes currently supports EPUB and plain text. PDF annotation is on the list, not yet built.</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

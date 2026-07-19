@@ -1,0 +1,18 @@
+<!-- FIXTURE: a link that has excellent contrast at rest (#1a1a1a on white, ~17.4:1) but drops to a near-invisible contrast on :hover (#cccccc on white, ~1.61:1) | GROUND TRUTH: FAILS 1.4.3 in its hover-state presentation -- WCAG's contrast requirement applies to text "as rendered," and the hover state is a rendered state a sighted mouse user actually encounters. A single-pass static DOM scan that never triggers :hover will only ever see the resting-state color and will report this page as fully compliant. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>State-dependent contrast: hover failure</title>
+<style>
+  .nav-link { color: #1a1a1a; font-size: 16px; text-decoration: underline; }
+  .nav-link:hover { color: #cccccc; }
+</style>
+</head>
+<body style="background:#ffffff; font-family: Arial, sans-serif; padding: 40px; margin:0;">
+<h1 style="color:#000000; font-size:20px;">Hover-state contrast probe</h1>
+<p style="color:#333; max-width:520px;">At rest this link is dark text on white (~17.4:1, easily compliant). Hover it: the color shifts to light gray on white (~1.61:1, far below the 4.5:1 minimum). A scan that never simulates :hover never sees the failure.</p>
+<p><a href="#" class="nav-link">View pricing details</a></p>
+</body>
+</html>

@@ -1,0 +1,19 @@
+<!-- FIXTURE: an icon-only search-trigger button labeled by what the icon LOOKS like ("magnifying glass") instead of what activating it DOES ("Search") | GROUND TRUTH: FAILS the intent of WCAG 2.4.6 -- the name is non-empty and even descriptive of the glyph, but a screen-reader user hears "magnifying glass, button" with no indication that it opens search. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Useless accessible name: describes icon, not action</title>
+</head>
+<body style="background:#ffffff; font-family: Arial, sans-serif; padding: 40px; margin:0;">
+<h1 style="color:#000000; font-size:20px;">Accessible-name probe: label describes the glyph, not the action</h1>
+<p style="color:#333; max-width:520px;">This toolbar button opens the site's search panel when activated. Its accessible name describes the icon's appearance rather than the action it performs.</p>
+<button aria-label="magnifying glass" style="font-size:18px; padding:10px; background:#f3f4f6; color:#111; border:1px solid #ccc; border-radius:6px;">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false">
+    <circle cx="11" cy="11" r="7"/>
+    <path d="M21 21l-4.35-4.35"/>
+  </svg>
+</button>
+</body>
+</html>

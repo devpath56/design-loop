@@ -1,0 +1,57 @@
+<!-- FIXTURE: purple-to-blue gradient hero on an otherwise white page, white centered headline | GROUND TRUTH: SLOP. This is anti-patterns.md's "single most-recognised AI aesthetic" and slop-test gate 2 (purple-to-blue gradient) plus gate 6 (centered hero). Contrast was computed at both gradient stops and three midpoints (t=0,0.25,0.5,0.75,1.0): white text on #3a2a6e is 12.10:1, on #1e3a8a is 10.36:1, and the midpoints sit between those two values monotonically, so white text clears 4.5:1 everywhere along the gradient. The rest of the page (body copy, cards) uses plain ink-on-white at 17.4:1. Deterministic gate passes clean; the audit should flag the gradient hero immediately. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nimbus — Cloud infrastructure, simplified</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; overflow-x: clip; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: #1a1a1a; background: #ffffff; line-height: 1.6;
+  }
+  img, svg { max-width: 100%; height: auto; display: block; }
+  a:focus-visible, button:focus-visible { outline: 2px solid #1a1a1a; outline-offset: 2px; }
+  .hero {
+    background: linear-gradient(135deg, #3a2a6e 0%, #1e3a8a 100%);
+    color: #ffffff; text-align: center; padding: 120px 32px;
+  }
+  .hero h1 { font-size: clamp(2rem, 5vw, 3.5rem); margin: 0 0 16px; }
+  .hero p { max-width: 50ch; margin: 0 auto 28px; font-size: 1.15rem; opacity: 1; }
+  .hero .btn {
+    background: #ffffff; color: #1e3a8a; border: none; border-radius: 999px;
+    padding: 14px 32px; font-size: 1rem; font-weight: 600; cursor: pointer;
+  }
+  .hero .btn:focus-visible { outline: 2px solid #ffffff; outline-offset: 3px; }
+  .section { max-width: 900px; margin: 0 auto; padding: 64px 32px; }
+  .section h2 { font-size: 1.75rem; margin: 0 0 16px; }
+  .section p { color: #4a4a4a; max-width: 65ch; }
+  .footer {
+    text-align: center; padding: 32px; color: #6b6b6b; font-size: 0.85rem;
+    border-top: 1px solid #e5e5e5;
+  }
+</style>
+</head>
+<body>
+  <header class="hero">
+    <h1>Cloud infrastructure, simplified</h1>
+    <p>Deploy, scale, and monitor your applications from a single dashboard built for modern teams.</p>
+    <button class="btn" type="button">Get started free</button>
+  </header>
+  <main>
+    <section class="section">
+      <h2>Built for reliability</h2>
+      <p>Nimbus runs across three availability zones by default, with automatic failover and zero-downtime deploys, so your team can focus on the product instead of the platform.</p>
+    </section>
+    <section class="section">
+      <h2>Priced to scale with you</h2>
+      <p>Start on the free tier and move up only when your usage grows. No surprise invoices, no forced annual contracts.</p>
+    </section>
+  </main>
+  <footer class="footer">
+    <p>&copy; 2026 Nimbus Cloud, Inc.</p>
+  </footer>
+</body>
+</html>

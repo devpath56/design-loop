@@ -1,0 +1,20 @@
+<!-- FIXTURE: white text (#ffffff) overlaid on a background-image (inline SVG data URI) that is near-white (#f5f5f5) in its top half and dark (#4a4a4a) in its bottom half | GROUND TRUTH: FAILS 1.4.3 for the text sitting in the top (light) half -- measured ratio there is ~1.09:1, effectively invisible. The bottom half is fine (~8.86:1). Because the failure is region-dependent and the background is a raster/vector image rather than a flat color, a contrast engine that samples computed background-color (which is "transparent" here) or simply skips image-backed text will report "cannot determine" and this often surfaces as a pass/non-blocking result rather than a fail. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contrast over background-image</title>
+</head>
+<body style="background:#ffffff; font-family: Arial, sans-serif; padding: 0; margin:0;">
+<div style="background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MDAiIGhlaWdodD0iNDAwIiB2aWV3Qm94PSIwIDAgODAwIDQwMCI+CjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSI4MDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjVmNWY1Ii8+CjxyZWN0IHg9IjAiIHk9IjIwMCIgd2lkdGg9IjgwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9IiM0YTRhNGEiLz4KPC9zdmc+Cg=='); background-size: cover; background-repeat: no-repeat; padding: 40px; min-height: 400px; box-sizing: border-box;">
+  <h1 style="color:#ffffff; font-size:20px; margin-top:0;">Contrast-over-background-image probe</h1>
+  <p style="color:#ffffff; font-size:16px; font-weight:400; max-width:480px;">
+  This heading and this first line of body text sit over the near-white top band of the background image (measured contrast ~1.09:1 -- invisible). The line below sits over the dark bottom band and is perfectly readable.
+  </p>
+  <p style="color:#ffffff; font-size:16px; font-weight:400; max-width:480px; margin-top:220px;">
+  This line sits over the dark band (measured contrast ~8.86:1 -- fine).
+  </p>
+</div>
+</body>
+</html>

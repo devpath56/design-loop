@@ -1,0 +1,16 @@
+<!-- FIXTURE: unhandled promise rejection (no .catch, no surrounding try/catch) | GROUND TRUTH: this fires an 'unhandledrejection' event, not a standard window.onerror / page 'error' event. Many "console/page error" checks listen only for window.onerror or a pageerror event and never register a listener for unhandledrejection, so this class of failure — extremely common with fetch()/async code — slips through silently even though it represents a real, unhandled runtime fault. -->
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Unhandled Rejection</title></head>
+<body>
+<h1>Account settings</h1>
+<script>
+function loadUserPrefs() {
+  return new Promise(function(resolve, reject) {
+    reject(new Error('prefs store unavailable'));
+  });
+}
+loadUserPrefs(); // no .catch — rejection is unhandled
+</script>
+</body>
+</html>

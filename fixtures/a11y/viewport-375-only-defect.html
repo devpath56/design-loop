@@ -1,0 +1,20 @@
+<!-- FIXTURE: a "read more" link is dark and compliant at desktop widths, but a max-width:480px media query swaps it to a very light gray that fails contrast -- the defect exists ONLY at mobile viewport widths | GROUND TRUTH: FAILS 1.4.3 at 375px viewport (rgb(208,208,208) on white, ~1.54:1); PASSES at 1280px viewport (rgb(51,51,51) on white, ~12.6:1). A gate that only renders/audits one viewport width, or that audits desktop first and treats it as authoritative, will miss this entirely. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Viewport-dependent contrast: mobile-only failure</title>
+<style>
+  .read-more { color: #333333; font-size: 16px; }
+  @media (max-width: 480px) {
+    .read-more { color: #d0d0d0; }
+  }
+</style>
+</head>
+<body style="background:#ffffff; font-family: Arial, sans-serif; padding: 40px; margin:0;">
+<h1 style="color:#000000; font-size:20px;">Viewport probe: defect only below 480px</h1>
+<p style="color:#333; max-width:520px;">At desktop widths this link is dark gray on white (~12.6:1, compliant). Below a 480px viewport, a media query swaps it to a very light gray on the same white background (~1.54:1, a clear failure).</p>
+<p><a href="#" class="read-more">Read more about our return policy</a></p>
+</body>
+</html>

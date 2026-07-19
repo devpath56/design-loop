@@ -1,0 +1,57 @@
+<!-- FIXTURE: uses Inter at default weight as the only face (the named tell) but the rest of the page — spacing rhythm, copy specificity, asymmetric layout, restrained color — is genuinely considered | GROUND TRUTH: GREY, and I am not sure. design.md bans "Inter/Space-Grotesk at default weight as the safe face" outright, with no carve-out. Taken literally, this page fails on sight: one font, one weight (400, with 600 only for the wordmark). But nothing else here is generic — the layout is asymmetric (a 60/40 split, not centered), the copy is specific to a real workflow instead of generic SaaS-speak, there's no card grid, no gradient, no emoji, no rounded-lg-everywhere, and the color system is a single restrained ink-on-warm-white pair with one considered accent used exactly once. A designer could plausibly ship this and call the typography choice "deliberately quiet" rather than "defaulted". The question this fixture is meant to raise: does ONE named tell (default-weight Inter) sink an otherwise well-made page, or is the anti-slop audit really about the *combination* of tells, not any single one in isolation? I'd lean slop because design.md states this one without qualification — but a reasonable reviewer could disagree, which is exactly why it belongs in the grey pile. Contrast computed: ink #1a1a1a on warm white #fbfaf7 (approximated here as #fdfdfb, effectively white) = ~17:1; muted #4a4a4a on same = 8.86:1. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ledgerline — Bookkeeping for freelance studios</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; overflow-x: clip; }
+  body {
+    font-family: Inter, sans-serif; font-weight: 400;
+    color: #1a1a1a; background: #fdfdfb; line-height: 1.6;
+  }
+  img, svg { max-width: 100%; height: auto; display: block; }
+  a:focus-visible, button:focus-visible { outline: 2px solid #1a1a1a; outline-offset: 2px; }
+  .layout {
+    max-width: 1080px; margin: 0 auto; padding: 88px 32px;
+    display: grid; grid-template-columns: 3fr 2fr; gap: 64px; align-items: start;
+  }
+  @media (max-width: 720px) { .layout { grid-template-columns: 1fr; } }
+  .layout h1 { font-size: 2.4rem; font-weight: 600; margin: 0 0 20px; max-width: 16ch; }
+  .layout .lede { color: #4a4a4a; max-width: 48ch; margin: 0 0 28px; }
+  .btn {
+    display: inline-block; background: #1a1a1a; color: #ffffff; border: none;
+    padding: 13px 24px; font-size: 0.95rem; text-decoration: none; border-radius: 4px;
+  }
+  .side { border-left: 1px solid #e5e0d5; padding-left: 32px; }
+  .side dl { margin: 0; }
+  .side dt { font-size: 0.8rem; color: #6b6b6b; margin: 0 0 2px; }
+  .side dd { margin: 0 0 20px; font-size: 1.05rem; }
+  .side dd:last-child { margin-bottom: 0; }
+  .accent { color: #0f5132; }
+  .footer { max-width: 1080px; margin: 0 auto; padding: 0 32px 48px; color: #6b6b6b; font-size: 0.85rem; }
+</style>
+</head>
+<body>
+  <div class="layout">
+    <div>
+      <h1>Bookkeeping built around retainers, not invoices</h1>
+      <p class="lede">Ledgerline tracks studio income the way it actually arrives — partial payments, kill fees, and net-60 clients — instead of forcing every line into a generic invoice template.</p>
+      <a class="btn" href="#start">Set up your ledger</a>
+    </div>
+    <div class="side">
+      <dl>
+        <dt>Built for</dt>
+        <dd>Design and dev studios billing 2–8 active clients at once</dd>
+        <dt>Pricing</dt>
+        <dd>$24/month, one studio seat, unlimited clients</dd>
+        <dt>Status</dt>
+        <dd><span class="accent">Open for new studios this quarter</span></dd>
+      </dl>
+    </div>
+  </div>
+  <p class="footer">Ledgerline is built by two people who used to invoice each other by hand.</p>
+</body>
+</html>

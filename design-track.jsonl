@@ -1,0 +1,12 @@
+{"term":"figure/ground","runId":"rb9131bbd","box":0,"last":"2026-07-19","history":[]}
+{"term":"value structure","runId":"rb9131bbd","box":0,"last":"2026-07-19","history":[]}
+{"term":"motivated decoration","runId":"rb9131bbd","box":0,"last":"2026-07-19","history":[]}
+{"term":"scrim","runId":"rb9131bbd","box":0,"last":"2026-07-19","history":[]}
+{"term":"visual record","runId":"raaeb4983","box":0,"last":"2026-07-19","history":[]}
+{"term":"viewport vs full-page capture","runId":"raaeb4983","box":0,"last":"2026-07-19","history":[]}
+{"term":"object-fit: contain vs cover","runId":"raaeb4983","box":0,"last":"2026-07-19","history":[]}
+{"term":"hanging indent","runId":"r3e224151","box":0,"last":"2026-07-19","history":[]}
+{"term":"user enumeration","runId":"r3e224151","box":0,"last":"2026-07-19","history":[]}
+{"term":"state as motion","runId":"r3e224151","box":0,"last":"2026-07-19","history":[]}
+{"term":"enforcement gap","runId":"t:enforcement-gap","gloss":"the distance between where a rule is STATED and where it is CHECKED. design.md states the copy rule and craft-evals checks it, so that gap is zero. The same rule applied to my replies is stated in memory and checked nowhere, so it decayed within one message.","box":0,"last":"2026-07-19","history":[]}
+{"term":"reminder-tier rule","runId":"t:enforcement-gap","gloss":"Trident house-rule 1 ranks detectors: deterministic root-cause > deterministic detection > LLM-judge > written reminder. A reminder is the weakest tier and every reminder-tier rule in this session decayed. Naming the tier is how you predict which rules will hold.","box":0,"last":"2026-07-19","history":[]}

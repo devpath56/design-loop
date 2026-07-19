@@ -1,0 +1,15 @@
+<!-- FIXTURE: error thrown only inside a click handler, never on static load | GROUND TRUTH: the page loads perfectly clean — no console output, no thrown errors — because the buggy code path only executes when a user clicks "Delete account". A gate that only observes a passive page load (even a long one) never triggers this handler and reports a false PASS on a page with a broken primary action. -->
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Click-only Error</title></head>
+<body>
+<h1>Account</h1>
+<button id="del">Delete account</button>
+<script>
+document.getElementById('del').addEventListener('click', function() {
+  var user = window.currentUser; // never set anywhere
+  console.log('Deleting ' + user.id); // throws: Cannot read properties of undefined
+});
+</script>
+</body>
+</html>

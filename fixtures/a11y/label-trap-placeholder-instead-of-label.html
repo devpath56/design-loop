@@ -1,0 +1,17 @@
+<!-- FIXTURE: an email input with only a placeholder attribute ("Enter your email") and no <label>, aria-label, or aria-labelledby | GROUND TRUTH: FAILS WCAG 1.3.1 / 3.3.2 / 4.1.2 -- placeholder text is not an accessible name source under the accname computation spec's normal precedence (it is a last-resort fallback in some engines only), it disappears the moment the user types, and it is not exposed consistently across browser/AT combinations. A checker running a strict/modern accname algorithm should flag this; one that treats placeholder as an acceptable substitute for a real label (a known historical bug in some rule configurations) will incorrectly pass it. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Label trap: placeholder instead of label</title>
+</head>
+<body style="background:#ffffff; font-family: Arial, sans-serif; padding: 40px; margin:0;">
+<h1 style="color:#000000; font-size:20px;">Label probe: placeholder used instead of a real label</h1>
+<p style="color:#333; max-width:520px;">This field has no associated &lt;label&gt;, aria-label, or aria-labelledby -- only a placeholder.</p>
+<form>
+  <input type="email" name="email" placeholder="Enter your email" style="font-size:16px; padding:8px 10px; border:1px solid #767676; width:260px;">
+  <button type="submit" style="font-size:16px; padding:9px 16px; margin-left:8px;">Subscribe</button>
+</form>
+</body>
+</html>

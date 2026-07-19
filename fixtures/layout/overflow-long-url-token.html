@@ -1,0 +1,18 @@
+<!-- FIXTURE: horizontal overflow caused by a long unbroken real-world string (URL/token) | GROUND TRUTH: the layout is fine with short placeholder text but breaks the moment realistic content (a signed URL, an API key, a long filename) is substituted in, because nothing sets word-break/overflow-wrap on the value. A design review done with lorem-ipsum placeholders would miss this; a gate that renders the real template with representative data should catch it. -->
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Long Token Overflow</title>
+<style>
+ body{margin:0;font-family:sans-serif;padding:16px;}
+ .field{border:1px solid #ccc;padding:8px;max-width:400px;}
+ .value{white-space:nowrap;}
+</style>
+</head>
+<body>
+<h1>Webhook signing secret</h1>
+<div class="field">
+  <div>Secret:</div>
+  <div class="value">whsec_8f3a1c9d2e7b4a6f0c1d3e5f7a9b1c3d5e7f9a1b3c5d7e9f1a3b5c7d9e1f3a5b7c9d1e3f5a7b9c1d3e5f7a9b</div>
+</div>
+</body>
+</html>

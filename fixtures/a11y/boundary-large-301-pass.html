@@ -1,0 +1,15 @@
+<!-- FIXTURE: large-scale text (26px, regular weight) at a measured contrast ratio of 3.0101:1 (rgb(146,146,178) on white) -- above the 3:1 large-text minimum but well below the 4.5:1 normal-text minimum | GROUND TRUTH: PASSES 1.4.3 as large text (>=3:1 required), but WOULD incorrectly FAIL if the checker misclassifies this as normal-size text and applies 4.5:1. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Boundary: large text at 3.01:1</title>
+</head>
+<body style="background:#ffffff; font-family: Arial, sans-serif; padding: 40px; margin:0;">
+<h1 style="color:#000000; font-size:20px;">Contrast boundary probe: large text, 3.01:1</h1>
+<p style="color: rgb(146,146,178); background:#ffffff; font-size: 26px; font-weight: 400; max-width: 600px; line-height:1.3;">
+Large-scale heading copy at 26px regular weight. Measured contrast ratio is 3.0101:1 against this white background. This clears the 3:1 minimum that applies to large-scale text under WCAG 1.4.3, so a correct gate must accept this page -- but only if it correctly detects the 26px/400-weight text as "large scale" and applies 3:1 rather than the normal-text 4.5:1 threshold, which this ratio would fail.
+</p>
+</body>
+</html>

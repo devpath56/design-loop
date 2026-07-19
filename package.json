@@ -1,0 +1,28 @@
+{
+  "name": "design-loop",
+  "private": true,
+  "type": "module",
+  "version": "0.1.0",
+  "description": "A self-triggered design self-learning loop (make -> check -> gate -> learn) for an HTML prototype.",
+  "scripts": {
+    "design-gate": "node checks/design-gate.mjs",
+    "design-log": "node checks/render-log.mjs",
+    "eval-gate": "node checks/eval-gate.mjs",
+    "status": "node checks/status.mjs",
+    "dashboard": "node checks/dashboard.mjs",
+    "replay": "node checks/replay.mjs",
+    "states": "node checks/state-matrix.mjs",
+    "serve": "python3 -m http.server 8000",
+    "workbench": "node checks/workbench.mjs",
+    "instrument": "node checks/instrument.mjs",
+    "craft": "node checks/craft-evals.mjs",
+    "audit-brief": "node checks/audit-brief.mjs",
+    "track": "node checks/track.mjs",
+    "verify-render": "node checks/verify-render.mjs",
+    "test": "node checks/test-state-taxonomy.mjs"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.0",
+    "playwright": "1.56.1"
+  }
+}

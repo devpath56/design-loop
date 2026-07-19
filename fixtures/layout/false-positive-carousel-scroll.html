@@ -1,0 +1,22 @@
+<!-- FIXTURE: FALSE-POSITIVE BAIT — an intentional, correctly-implemented horizontally-scrolling carousel | GROUND TRUTH: this is correct, common design (image carousel with its own overflow-x:auto container, fixed viewport width, scroll-snap). The document itself never exceeds viewport width at 375px or 1280px; only the inner carousel track scrolls, with a visible affordance (partial next card peeking in) signaling scrollability. A gate must NOT flag this as a layout defect — doing so would be a false positive that punishes correct, deliberate UI. -->
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Carousel (correct)</title>
+<style>
+ body{margin:0;font-family:sans-serif;padding:16px;}
+ .carousel{display:flex;overflow-x:auto;gap:12px;scroll-snap-type:x mandatory;max-width:100%;padding-bottom:8px;}
+ .slide{flex:0 0 240px;height:140px;scroll-snap-align:start;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;}
+ .s1{background:#a5451f;} .s2{background:#3d405b;} .s3{background:#2f6b52;} .s4{background:#f2cc8f;color:#333;} .s5{background:#264653;}
+</style>
+</head>
+<body>
+<h1>Featured collections</h1>
+<div class="carousel" tabindex="0" role="region" aria-label="Seasons carousel">
+  <div class="slide s1">Spring</div>
+  <div class="slide s2">Summer</div>
+  <div class="slide s3">Autumn</div>
+  <div class="slide s4">Winter</div>
+  <div class="slide s5">Holiday</div>
+</div>
+</body>
+</html>

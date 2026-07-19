@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MarbleInk — playground</title>
+<style>
+  :root[data-theme="dark"] {
+    --ink: #f4f3f7; --dim: #a5a2b2; --ground: #0a090f;
+    --chrome: rgba(10,9,15,.42); --line: rgba(255,255,255,.16); --track: rgba(255,255,255,.2);
+  }
+  :root[data-theme="light"] {
+    --ink: #12111a; --dim: #55525f; --ground: #f7f6f9;
+    --chrome: rgba(255,255,255,.58); --line: rgba(18,17,26,.14); --track: rgba(18,17,26,.16);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { height:100%; overflow:hidden; }
+  body {
+    background: var(--ground); color: var(--ink);
+    font-family: ui-sans-serif, -apple-system, "Segoe UI", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  #bg { position:fixed; inset:0; width:100%; height:100%; z-index:0; pointer-events:none; }
+
+  .stage {
+    position:relative; z-index:20; height:100%;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:1rem; padding:2rem 1.5rem 9rem; text-align:center;
+  }
+  .eyebrow {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size:.68rem; letter-spacing:.22em; text-transform:uppercase; opacity:.62;
+  }
+  h1 { font-size:clamp(2.6rem,8vw,5.5rem); font-weight:250; letter-spacing:-.045em; line-height:.92; text-wrap:balance; }
+  h1 em { font-style:italic; font-weight:400; }
+  .sub {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size:.82rem; line-height:1.65; opacity:.68; max-width:46ch;
+  }
+
+  .console {
+    position:fixed; z-index:30; left:50%; bottom:1.4rem; transform:translateX(-50%);
+    width:min(760px, calc(100vw - 2rem));
+    background:var(--chrome); border:1px solid var(--line); border-radius:12px;
+    backdrop-filter:blur(20px) saturate(1.4); -webkit-backdrop-filter:blur(20px) saturate(1.4);
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    display:flex; align-items:center; justify-content:space-between;
+    flex-wrap:wrap; gap:.75rem 1.4rem; padding:.75rem 1rem;
+  }
+  .lbl { font-size:.58rem; letter-spacing:.18em; text-transform:uppercase; color:var(--dim); display:block; margin-bottom:.4rem; }
+  .swatches { display:flex; gap:.38rem; }
+  .sw { width:24px; height:24px; border-radius:6px; padding:0; border:1.5px solid transparent; cursor:pointer; transition:transform .16s ease, border-color .16s ease; }
+  .sw:hover { transform:translateY(-2px); }
+  .sw[aria-pressed="true"] { border-color:var(--ink); }
+  .sw:focus-visible { outline:2px solid var(--ink); outline-offset:2px; }
+  .dials { display:flex; gap:1.3rem; }
+  .row { display:flex; align-items:center; gap:.55rem; }
+  input[type=range] {
+    -webkit-appearance:none; appearance:none; width:88px; height:3px;
+    border-radius:2px; background:var(--track); cursor:pointer;
+  }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:13px; height:13px; border-radius:50%; background:var(--ink); }
+  input[type=range]::-moz-range-thumb { width:13px; height:13px; border:none; border-radius:50%; background:var(--ink); }
+  input[type=range]:focus-visible { outline:2px solid var(--ink); outline-offset:4px; }
+  .val { font-size:.68rem; font-variant-numeric:tabular-nums; opacity:.8; min-width:3.1ch; text-align:right; }
+  .btn {
+    font:inherit; font-size:.65rem; letter-spacing:.1em; text-transform:uppercase;
+    cursor:pointer; padding:.5rem .8rem; border-radius:8px;
+    border:1px solid var(--line); background:transparent; color:var(--ink);
+  }
+  .btn:hover { background:var(--line); }
+</style>
+</head>
+<body>
+
+<canvas id="bg"></canvas>
+
+<div class="stage">
+  <p class="eyebrow">marble ink &middot; one shader &middot; no dependencies</p>
+  <h1>Mesh gradient,<br><em>from scratch</em></h1>
+  <p class="sub">Domain-warped fBm noise. The cursor is a force on the field, not a filter over it.</p>
+</div>
+
+<div class="console">
+  <div>
+    <span class="lbl">palette</span>
+    <div class="swatches" id="swatches"></div>
+  </div>
+  <div class="dials">
+    <div>
+      <label class="lbl" for="warp">warp</label>
+      <div class="row"><input type="range" id="warp" min="0" max="100" value="55"><span class="val" id="warpV">0.55</span></div>
+    </div>
+    <div>
+      <label class="lbl" for="speed">speed</label>
+      <div class="row"><input type="range" id="speed" min="0" max="100" value="35"><span class="val" id="speedV">0.35</span></div>
+    </div>
+  </div>
+  <button class="btn" id="theme">light mode</button>
+</div>
+
+<script type="module">
+import { MarbleInk, presets, presetNames } from '../src/index.js';
+
+const fx = new MarbleInk(document.getElementById('bg'), { palette: 'ember' });
+
+const wrap = document.getElementById('swatches');
+let current = 'ember';
+
+presetNames.forEach((name) => {
+  const b = document.createElement('button');
+  b.className = 'sw';
+  b.title = name;
+  b.setAttribute('aria-label', 'Palette: ' + name);
+  b.setAttribute('aria-pressed', String(name === current));
+  const stops = presets[name].dark;
+  b.style.background = `linear-gradient(135deg, ${stops[1]}, ${stops[3]})`;
+  b.onclick = () => {
+    current = name;
+    fx.set({ palette: name });
+    [...wrap.children].forEach((c) => c.setAttribute('aria-pressed', String(c.title === name)));
+  };
+  wrap.appendChild(b);
+});
+
+const warpV = document.getElementById('warpV');
+const speedV = document.getElementById('speedV');
+document.getElementById('warp').oninput = (e) => {
+  const v = e.target.value / 100; fx.set({ warp: v }); warpV.textContent = v.toFixed(2);
+};
+document.getElementById('speed').oninput = (e) => {
+  const v = e.target.value / 100; fx.set({ speed: v }); speedV.textContent = v.toFixed(2);
+};
+
+document.getElementById('theme').onclick = (e) => {
+  const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+  document.documentElement.dataset.theme = next;
+  e.target.textContent = next === 'dark' ? 'light mode' : 'dark mode';
+  // theme:'auto' means the engine picks this up from data-theme on its own
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!-- FIXTURE: a three-equal-column grid, but the content is a genuine three-tier pricing table, not features padded out to fill a template | GROUND TRUTH: GREY. anti-patterns.md flags "The 3-column feature grid" — icon-above-heading, three equal cards. This page has three equal columns too, but they're pricing tiers, where three-across is close to the only legible way to let a reader compare Starter/Team/Studio side by side; the alternative (stacking them vertically) actively makes comparison harder. There are no icons, no icon-above-heading pattern, and the columns aren't padded with vague copy — each cell is a real price and a real, differentiated feature list. Is a 3-column grid still a tell when the content is inherently tabular/comparative rather than three arbitrary "value props" chosen to fill a template? I think pricing tables are close to a legitimate exception, but I'm flagging it as grey rather than certain-fine because the visual silhouette (three equal boxes, one lightly highlighted as "recommended") is still extremely close to the generic template, and a naive detector would almost certainly flag it. Contrast computed: ink #1a1a1a on white #ffffff = 17.4:1; muted #4a4a4a on white = 8.86:1; white on emerald-700 #047857 (the "Recommended" badge) = 5.48:1. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kiln — Pricing</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; overflow-x: clip; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: #1a1a1a; background: #ffffff; line-height: 1.6;
+  }
+  img, svg { max-width: 100%; height: auto; display: block; }
+  a:focus-visible, button:focus-visible { outline: 2px solid #1a1a1a; outline-offset: 2px; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 64px 32px; }
+  h1 { font-size: 1.9rem; margin: 0 0 8px; }
+  .lede { color: #4a4a4a; margin: 0 0 40px; max-width: 60ch; }
+  .tiers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; align-items: stretch; }
+  @media (max-width: 720px) { .tiers { grid-template-columns: 1fr; } }
+  .tier {
+    border: 1px solid #e5e5e5; border-radius: 8px; padding: 28px 24px; display: flex; flex-direction: column;
+  }
+  .tier--recommended { border-color: #047857; }
+  .badge {
+    display: inline-block; background: #047857; color: #ffffff; font-size: 0.75rem;
+    font-weight: 700; padding: 3px 10px; border-radius: 4px; margin-bottom: 12px; align-self: flex-start;
+  }
+  .tier h2 { font-size: 1.2rem; margin: 0 0 4px; }
+  .tier .price { font-size: 2rem; font-weight: 700; margin: 0 0 4px; }
+  .tier .price span { font-size: 0.95rem; font-weight: 400; color: #6b6b6b; }
+  .tier .desc { color: #6b6b6b; font-size: 0.9rem; margin: 0 0 20px; }
+  .tier ul { list-style: none; margin: 0 0 24px; padding: 0; flex: 1; }
+  .tier li { padding: 6px 0; border-top: 1px solid #f0f0f0; font-size: 0.92rem; }
+  .tier li:first-child { border-top: none; }
+  .tier .btn {
+    display: block; text-align: center; text-decoration: none; padding: 11px; border-radius: 6px;
+    font-size: 0.95rem;
+  }
+  .tier--plain .btn { background: #ffffff; color: #1a1a1a; border: 1px solid #1a1a1a; }
+  .tier--recommended .btn { background: #047857; color: #ffffff; border: none; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Pricing that scales with kiln bookings, not seats</h1>
+    <p class="lede">Every plan includes unlimited students. You only pay more when you're firing more kilns.</p>
+    <div class="tiers">
+      <article class="tier tier--plain">
+        <h2>Starter</h2>
+        <p class="price">$0<span>/month</span></p>
+        <p class="desc">One kiln, up to 15 students on the roster.</p>
+        <ul>
+          <li>1 kiln schedule</li>
+          <li>Email booking confirmations</li>
+          <li>Community support</li>
+        </ul>
+        <a class="btn" href="#starter">Start free</a>
+      </article>
+      <article class="tier tier--recommended">
+        <span class="badge">Most studios pick this</span>
+        <h2>Team</h2>
+        <p class="price">$39<span>/month</span></p>
+        <p class="desc">Up to 4 kilns, unlimited students, waitlists.</p>
+        <ul>
+          <li>4 kiln schedules</li>
+          <li>Automatic waitlist promotion</li>
+          <li>SMS reminders</li>
+        </ul>
+        <a class="btn" href="#team">Start 14-day trial</a>
+      </article>
+      <article class="tier tier--plain">
+        <h2>Studio</h2>
+        <p class="price">$99<span>/month</span></p>
+        <p class="desc">Unlimited kilns, multi-location scheduling.</p>
+        <ul>
+          <li>Unlimited kiln schedules</li>
+          <li>Multi-location calendar</li>
+          <li>Priority support</li>
+        </ul>
+        <a class="btn" href="#studio">Talk to us</a>
+      </article>
+    </div>
+  </div>
+</body>
+</html>

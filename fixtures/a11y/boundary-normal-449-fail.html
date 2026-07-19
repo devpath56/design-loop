@@ -1,0 +1,15 @@
+<!-- FIXTURE: normal-size body text at a measured contrast ratio of 4.4900:1 (rgb(120,120,102) on white), 0.01 below the WCAG AA 4.5:1 minimum | GROUND TRUTH: FAILS 1.4.3 Contrast (Minimum) -- it is below threshold, however narrowly. There is no "close enough" exception in the normative text. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Boundary: normal text at 4.49:1</title>
+</head>
+<body style="background:#ffffff; font-family: Arial, sans-serif; padding: 40px; margin:0;">
+<h1 style="color:#000000; font-size:20px;">Contrast boundary probe: normal text, 4.49:1</h1>
+<p style="color: rgb(120,120,102); background:#ffffff; font-size: 16px; font-weight: 400; max-width: 480px;">
+This paragraph's text color is rgb(120,120,102) on a pure white background. The computed WCAG relative-luminance contrast ratio is 4.4900:1, which sits just 0.01 under the 4.5:1 minimum required for normal-size text under WCAG 1.4.3. A correct gate must reject this page.
+</p>
+</body>
+</html>

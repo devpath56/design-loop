@@ -1,0 +1,51 @@
+<!-- FIXTURE: lone acid-green pop color on a near-black surface | GROUND TRUTH: SLOP. Named directly in design.md: "lone acid-green/vermilion pop on near-black". It reads as the "hacker/AI-startup" palette default the moment a single saturated accent sits alone against #0a0a0a with nothing else in the palette to justify it. Contrast computed: body copy off-white #e8e8e8 on near-black #121212 = 15.29:1; acid green #c9ff3d on near-black #0a0a0a = 16.83:1 (used for the headline and button fill, both well clear of 4.5:1); near-black text #0a0a0a on the acid-green button fill = 16.83:1. Every control is a real named button/link. Deterministic gate passes clean; audit should flag the single-accent-on-near-black tell. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Voltra — Run your queries faster</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; overflow-x: clip; }
+  body {
+    font-family: "SF Mono", ui-monospace, "Cascadia Code", Menlo, monospace;
+    color: #e8e8e8; background: #0a0a0a; line-height: 1.6;
+  }
+  img, svg { max-width: 100%; height: auto; display: block; }
+  a:focus-visible, button:focus-visible { outline: 2px solid #c9ff3d; outline-offset: 2px; }
+  .hero { max-width: 720px; margin: 0 auto; padding: 100px 32px 64px; }
+  .hero h1 { font-size: clamp(2rem, 5vw, 3rem); margin: 0 0 20px; color: #c9ff3d; }
+  .hero p { font-size: 1.1rem; color: #e8e8e8; margin: 0 0 32px; max-width: 55ch; }
+  .btn {
+    display: inline-block; background: #c9ff3d; color: #0a0a0a; border: none;
+    border-radius: 4px; padding: 14px 28px; font-size: 1rem; font-family: inherit;
+    font-weight: 700; cursor: pointer; text-decoration: none;
+  }
+  .section { max-width: 720px; margin: 0 auto; padding: 48px 32px; border-top: 1px solid #262626; }
+  .section h2 { font-size: 1.4rem; margin: 0 0 12px; color: #e8e8e8; }
+  .section p { margin: 0; color: #b8b8b8; }
+  .footer { text-align: center; padding: 32px; color: #8a8a8a; font-size: 0.85rem; }
+</style>
+</head>
+<body>
+  <header class="hero">
+    <h1>Run your queries faster</h1>
+    <p>Voltra indexes your warehouse tables in the background so dashboards load before the coffee finishes brewing.</p>
+    <a class="btn" href="#signup">Get an API key</a>
+  </header>
+  <main>
+    <section class="section">
+      <h2>How it works</h2>
+      <p>Point Voltra at your existing warehouse. It builds materialized views for your most common query shapes and keeps them fresh with incremental refresh, not full re-scans.</p>
+    </section>
+    <section class="section">
+      <h2>Works with what you have</h2>
+      <p>Snowflake, BigQuery, and Postgres today. No migration, no new query language, no lock-in.</p>
+    </section>
+  </main>
+  <footer class="footer">
+    <p>&copy; 2026 Voltra Systems.</p>
+  </footer>
+</body>
+</html>

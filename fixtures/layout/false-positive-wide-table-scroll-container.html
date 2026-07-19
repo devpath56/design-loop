@@ -1,0 +1,24 @@
+<!-- FIXTURE: FALSE-POSITIVE BAIT — a wide data table correctly wrapped in its own overflow-x:auto container | GROUND TRUTH: this is standard, correct practice for dense tabular data (e.g. an admin dashboard) that cannot reasonably reflow at 375px. The table scrolls within its bordered container; the document itself stays within viewport bounds at both 375px and 1280px. A gate should not fail this — it should only fail when the DOCUMENT overflows, not when a deliberately scoped scroll region exists. -->
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Wide Table (correct)</title>
+<style>
+ body{margin:0;font-family:sans-serif;padding:16px;}
+ .table-wrap{overflow-x:auto;border:1px solid #ccc;max-width:100%;}
+ table{border-collapse:collapse;min-width:900px;width:100%;}
+ th,td{border:1px solid #ddd;padding:6px 10px;text-align:left;white-space:nowrap;}
+ th{background:#f5f5f5;}
+</style>
+</head>
+<body>
+<h1>Transaction history</h1>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Quarterly data table">
+<table>
+<tr><th>ID</th><th>Date</th><th>Merchant</th><th>Category</th><th>Amount</th><th>Status</th><th>Reference</th></tr>
+<tr><td>1001</td><td>2026-07-01</td><td>Acme Corp</td><td>Software</td><td>$49.00</td><td>Cleared</td><td>REF-88213</td></tr>
+<tr><td>1002</td><td>2026-07-03</td><td>Globex Inc</td><td>Hardware</td><td>$1,204.50</td><td>Pending</td><td>REF-88214</td></tr>
+<tr><td>1003</td><td>2026-07-09</td><td>Initech</td><td>Consulting</td><td>$3,000.00</td><td>Cleared</td><td>REF-88215</td></tr>
+</table>
+</div>
+</body>
+</html>

@@ -1,0 +1,19 @@
+<!-- FIXTURE: a text input whose label/value text is fully compliant unfocused, but whose CSS explicitly lightens the text color to a near-invisible gray only while :focus is active | GROUND TRUTH: FAILS 1.4.3 (and undermines 2.4.7 Focus Visible in spirit) specifically in the focused state -- the moment a keyboard or screen-magnifier user tabs into the field to type, the value they type becomes nearly unreadable. A static scan that never tabs into form fields to trigger :focus never observes this. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>State-dependent contrast: focus failure</title>
+<style>
+  .field { font-size: 16px; padding: 8px 10px; border: 1px solid #767676; color: #1a1a1a; background: #ffffff; }
+  .field:focus { color: #d9d9d9; outline: none; border-color: #1a56db; }
+</style>
+</head>
+<body style="background:#ffffff; font-family: Arial, sans-serif; padding: 40px; margin:0;">
+<h1 style="color:#000000; font-size:20px;">Focus-state contrast probe</h1>
+<p style="color:#333; max-width:520px;">Unfocused, this field's typed text is dark on white (compliant). Tab into it (or click it) and type: the text color switches to a near-white gray on the same white background, well under 4.5:1.</p>
+<label for="promo" style="display:block; margin-bottom:6px; color:#000;">Promo code</label>
+<input id="promo" class="field" type="text" value="SAVE20">
+</body>
+</html>

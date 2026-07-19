@@ -1,0 +1,19 @@
+<!-- FIXTURE: vertical overflow — fixed-height container with overflow:hidden silently clips text | GROUND TRUTH: the stated claim ("no horizontal overflow") says nothing about vertical clipping. Here a terms-and-conditions block is truncated mid-sentence by a fixed-height, overflow:hidden card with no scroll affordance and no visual cue (no fade, no "read more"). A careful reviewer would flag this as a real defect (users cannot read a legal disclaimer) even though no horizontal-overflow or console-error check would ever catch it. Whether this should gate at all is debatable since the stated scope is horizontal-only. -->
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Vertical Clip</title>
+<style>
+ body{margin:0;font-family:sans-serif;padding:16px;}
+ .card{width:320px;height:80px;overflow:hidden;border:1px solid #999;padding:8px;}
+</style>
+</head>
+<body>
+<h1>Terms of service</h1>
+<div class="card">
+  <p>By continuing you agree to the following: all fees are non-refundable, arbitration is
+  mandatory, data may be shared with third-party partners for the purposes described in section 4,
+  and the service may be modified or discontinued at any time without notice. This clause continues
+  below the visible area and is never shown to the user.</p>
+</div>
+</body>
+</html>

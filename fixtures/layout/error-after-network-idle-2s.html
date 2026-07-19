@@ -1,0 +1,14 @@
+<!-- FIXTURE: uncaught error thrown 2000ms after load | GROUND TRUTH: same class of bug as the 500ms variant but with a longer delay to test whether the gate's observation window has any upper bound at all, or whether it truly stops right after network idle. A real user who lets the page sit for two seconds (e.g. a polling dashboard) hits a hard JS error; a single-pass gate with a short fixed timeout misses it. DELAY: 2000ms. -->
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Delayed Error 2s</title></head>
+<body>
+<h1>Live metrics</h1>
+<div id="metric">--</div>
+<script>
+setTimeout(function(){
+  undefinedFunctionThatDoesNotExist(); // throws ReferenceError
+}, 2000);
+</script>
+</body>
+</html>

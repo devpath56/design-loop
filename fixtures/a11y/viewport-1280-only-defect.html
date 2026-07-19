@@ -1,0 +1,32 @@
+<!-- FIXTURE: a caption is dark text over a plain white stacked-layout background on mobile (compliant), but a min-width:1024px media query switches the layout to two columns and places the SAME unchanged text color over a colored sidebar panel | GROUND TRUTH: PASSES at 375px (rgb(51,51,51) on white, ~12.6:1); FAILS at 1280px (rgb(51,51,51) on panel #5b6fa8, ~2.58:1). This is the mirror image of the mobile-only defect -- a desktop-only regression that a gate auditing only a mobile/default viewport would never catch. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Viewport-dependent contrast: desktop-only failure</title>
+<style>
+  .layout { background: #ffffff; }
+  .caption { color: #333333; font-size: 16px; padding: 16px; }
+  @media (min-width: 1024px) {
+    .layout { display: flex; }
+    .sidebar { background: #5b6fa8; flex: 0 0 280px; }
+    .main { flex: 1; padding: 16px; }
+  }
+</style>
+</head>
+<body style="background:#ffffff; font-family: Arial, sans-serif; padding: 0; margin:0;">
+<div style="padding:40px 40px 0;">
+<h1 style="color:#000000; font-size:20px;">Viewport probe: defect only at/above 1024px</h1>
+<p style="color:#333; max-width:520px;">On narrow viewports this caption stacks over a plain white background (~12.6:1, compliant). At 1024px and above, a two-column layout activates and the sidebar gets a colored panel background behind the same unchanged text color (~2.58:1, a clear failure).</p>
+</div>
+<div class="layout">
+  <aside class="sidebar">
+    <p class="caption">Free shipping on orders over $50</p>
+  </aside>
+  <div class="main">
+    <p style="color:#333;">Main column content.</p>
+  </div>
+</div>
+</body>
+</html>

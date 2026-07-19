@@ -1,0 +1,27 @@
+<!-- FIXTURE: horizontal overflow that ONLY occurs between the tested breakpoints (375px and 1280px) | GROUND TRUTH: a careful reviewer resizing the browser finds the page overflows horizontally in the 600px-1000px range (e.g. exactly at 768px and 900px) while being clean at both 375px and 1280px. Testing only two fixed widths is a sampling gap; this page is broken for real tablet/small-laptop users and a two-point check reports a false PASS. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Breakpoint Gap Overflow</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: sans-serif; }
+  .wrap { padding: 16px; }
+  .panel { background: #eef; border: 1px solid #99c; padding: 12px; width: 90vw; }
+  /* Only in the "gap" between the two tested breakpoints does this panel
+     become a fixed, oversized width that busts the document's horizontal bounds. */
+  @media (min-width: 600px) and (max-width: 1000px) {
+    .panel { width: 1400px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Pricing tiers</h1>
+  <div class="panel">This panel is 90vw at narrow widths (fine) and reverts to 90vw again above
+  1000px (fine), but locks to a hard 1400px between 600px and 1000px — exactly the tablet /
+  small-laptop band that a 375px + 1280px test matrix never samples.</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,25 @@
+<!-- FIXTURE: overflow-x:hidden on <html lang="en">/<body> used to mask a genuinely too-wide layout | GROUND TRUTH: a wide, absolutely-positioned promo banner extends far past the viewport edge. Rather than fixing the layout, overflow-x:hidden was slapped on the root elements, which suppresses the visible scrollbar and can make naive "is there a horizontal scrollbar" checks report clean. The banner's call-to-action button is rendered off-screen to the right and is completely unreachable by any user — mouse, keyboard, or touch — even though nothing "looks" broken in a screenshot of the left-aligned content. This is the highest-value case in the set: it directly attacks a checker that infers overflow from scrollbar presence rather than measuring actual content bounds. -->
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Masked Overflow</title>
+<style>
+ html,body{margin:0;overflow-x:hidden;font-family:sans-serif;}
+ .content{padding:16px;}
+ .banner{position:relative;height:120px;}
+ .promo{position:absolute;left:0;top:0;width:2400px;height:120px;background:linear-gradient(90deg,#4a6,#4a6 40%,#2a4);color:#fff;padding:16px;box-sizing:border-box;}
+ .cta{position:absolute;left:2200px;top:40px;padding:10px 20px;background:#fff;color:#2a4;border:none;font-weight:bold;}
+</style>
+</head>
+<body>
+<div class="content">
+  <h1>Summer sale</h1>
+  <div class="banner">
+    <div class="promo">
+      Save big this week only
+      <button class="cta">Claim offer</button>
+    </div>
+  </div>
+  <p>Everything below looks normal.</p>
+</div>
+</body>
+</html>

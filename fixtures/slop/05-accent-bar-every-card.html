@@ -1,0 +1,62 @@
+<!-- FIXTURE: thick coloured left-edge stripe on every card ("side-stripe card") | GROUND TRUTH: SLOP. anti-patterns.md names this exactly: "A card with a thick coloured border on one edge (usually left, 4-6px, purple or green). Very recognisable; very 2018-SaaS-AI." Every one of the five cards here carries a 6px left-edge accent bar with no semantic reason for which cards get which color — they're assigned round-robin. Contrast computed: card body text ink #1a1a1a on white #ffffff = 17.4:1; card heading same. Deterministic gate passes clean; audit should flag the repeated side-stripe pattern. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dockhand — Team updates, organized</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; overflow-x: clip; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: #1a1a1a; background: #ffffff; line-height: 1.6;
+  }
+  img, svg { max-width: 100%; height: auto; display: block; }
+  a:focus-visible, button:focus-visible { outline: 2px solid #1a1a1a; outline-offset: 2px; }
+  .wrap { max-width: 800px; margin: 0 auto; padding: 64px 32px; }
+  h1 { font-size: 2rem; margin: 0 0 8px; }
+  .lede { color: #4a4a4a; margin: 0 0 40px; max-width: 60ch; }
+  .card-list { display: flex; flex-direction: column; gap: 16px; }
+  .card {
+    background: #fafafa; border: 1px solid #e5e5e5; border-left-width: 6px;
+    border-radius: 6px; padding: 20px 24px;
+  }
+  .card--purple { border-left-color: #6d28d9; }
+  .card--green { border-left-color: #047857; }
+  .card--blue { border-left-color: #1e3a8a; }
+  .card--amber { border-left-color: #78350f; }
+  .card--purple2 { border-left-color: #6d28d9; }
+  .card h3 { margin: 0 0 6px; font-size: 1.05rem; }
+  .card p { margin: 0; color: #4a4a4a; font-size: 0.95rem; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Weekly updates</h1>
+    <p class="lede">A summary of what shipped across the team this week.</p>
+    <div class="card-list">
+      <article class="card card--purple">
+        <h3>Billing</h3>
+        <p>Invoices now generate 40% faster after moving the PDF render step off the request path.</p>
+      </article>
+      <article class="card card--green">
+        <h3>Search</h3>
+        <p>Typo-tolerant search shipped to 10% of accounts; full rollout planned for next week.</p>
+      </article>
+      <article class="card card--blue">
+        <h3>Mobile</h3>
+        <p>Fixed a crash on iOS 17 that affected users with more than 200 saved items.</p>
+      </article>
+      <article class="card card--amber">
+        <h3>Support</h3>
+        <p>Median first-response time dropped from 6 hours to 2 hours after the new routing rules.</p>
+      </article>
+      <article class="card card--purple2">
+        <h3>Infrastructure</h3>
+        <p>Migrated the job queue to the new cluster with no downtime during the cutover.</p>
+      </article>
+    </div>
+  </div>
+</body>
+</html>

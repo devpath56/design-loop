@@ -1,0 +1,17 @@
+<!-- FIXTURE: fixed mid-gray text (#8a8a8a) rendered over a CSS linear-gradient background that runs from white (left) to near-black (right) | GROUND TRUTH: FAILS 1.4.3 across the left/light portion of the gradient (~3.45:1, under the 4.5:1 minimum for normal text) even though the right/dark portion is comfortably compliant (~5.04:1). A contrast engine that reads only the declared `background-color` (which is unset/transparent, since the background is a gradient) has no single color to diff against and typically emits "cannot determine" rather than a fail -- a skip that reads as a pass in most CI gates. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contrast over CSS gradient</title>
+</head>
+<body style="background:#ffffff; font-family: Arial, sans-serif; padding: 0; margin:0;">
+<div style="background: linear-gradient(to right, #ffffff 0%, #ffffff 20%, #1a1a1a 80%, #1a1a1a 100%); padding: 60px 40px; min-height: 300px; box-sizing: border-box;">
+  <h1 style="color:#8a8a8a; font-size:20px; margin-top:0;">Contrast-over-gradient probe</h1>
+  <p style="color:#8a8a8a; font-size:16px; font-weight:400; max-width:700px;">
+  This single block of text spans the full width of a background that transitions from white on the left to near-black on the right, using one fixed text color throughout. The left portion measures roughly 3.45:1 against the white background (a fail for normal-size text, which needs 4.5:1); the right portion measures roughly 5.04:1 against the near-black background (a pass). There is no single "the background color" for this element -- it is a gradient, not a flat fill.
+  </p>
+</div>
+</body>
+</html>

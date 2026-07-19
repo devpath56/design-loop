@@ -1,0 +1,51 @@
+<!-- FIXTURE: cream #F4F1EA background + serif display + terracotta accents | GROUND TRUTH: SLOP. This exact combination is named verbatim in design.md's forbidden list: "cream #F4F1EA + serif + terracotta". It has become as recognizable an AI "editorial" default as the purple gradient is for SaaS. Contrast computed: body text charcoal #2b2b2b on cream #f4f1ea = 12.55:1 (body-safe); bright terracotta #b5652f on cream = 3.82:1, used only for the large display heading (>=24px, needs only 3:1 for large text, clears the bar); the CTA button uses a darker terracotta #a5551f with white text = 5.36:1 (body-safe, since 16px button-label text needs the full 4.5:1). Every button is a real named control. Deterministic gate passes; audit should flag the palette+face combination by name. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Field Notes — A quieter way to write</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; overflow-x: clip; }
+  body {
+    font-family: Georgia, "Iowan Old Style", "Times New Roman", serif;
+    color: #2b2b2b; background: #f4f1ea; line-height: 1.65;
+  }
+  img, svg { max-width: 100%; height: auto; display: block; }
+  a:focus-visible, button:focus-visible { outline: 2px solid #5c4a3a; outline-offset: 2px; }
+  .hero { max-width: 720px; margin: 0 auto; padding: 96px 32px 64px; text-align: center; }
+  .hero h1 { font-size: clamp(2rem, 5vw, 3rem); margin: 0 0 20px; color: #b5652f; }
+  .hero p { font-size: 1.15rem; color: #5c4a3a; margin: 0 auto 32px; max-width: 55ch; }
+  .btn {
+    display: inline-block; background: #a5551f; color: #ffffff; border: none;
+    border-radius: 4px; padding: 14px 30px; font-size: 1rem; font-family: inherit;
+    cursor: pointer; text-decoration: none;
+  }
+  .section { max-width: 640px; margin: 0 auto; padding: 48px 32px; }
+  .section h2 { font-size: 1.5rem; color: #5c4a3a; margin: 0 0 16px; }
+  .section p { margin: 0; }
+  .footer { text-align: center; padding: 32px; color: #5c4a3a; font-size: 0.9rem; border-top: 1px solid #ddd6c8; }
+</style>
+</head>
+<body>
+  <header class="hero">
+    <h1>A quieter way to write</h1>
+    <p>Field Notes is a distraction-free space for long-form thinking — no toolbars, no collaborators, no notifications.</p>
+    <a class="btn" href="#start">Begin writing</a>
+  </header>
+  <main>
+    <section class="section">
+      <h2>Why it feels different</h2>
+      <p>Most writing tools optimize for teams. Field Notes optimizes for the one person trying to finish a sentence. It opens to a blank page and stays out of the way.</p>
+    </section>
+    <section class="section">
+      <h2>Where your words live</h2>
+      <p>Everything saves locally first. There is no account wall between you and the page, and export is one keystroke away in plain text or markdown.</p>
+    </section>
+  </main>
+  <footer class="footer">
+    <p>&copy; 2026 Field Notes.</p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,13 @@
+<!-- FIXTURE: console.warn and console.info calls at load, zero console.error and zero thrown exceptions | GROUND TRUTH (grey): the page is functionally fine — the UI renders and works correctly. Whether this should gate is genuinely debatable. Position: console.info should never gate (it is routine, non-actionable noise). console.warn is murkier — a deprecation warning or a "falling back to default" warning can be an early signal of a real problem (e.g. a missing config that happens to have a safe default today but not tomorrow), so a strict gate might reasonably soft-fail or flag-for-review on warn without hard-failing the build, while a lenient gate ignores it entirely. Hard-failing on warn/info by default is likely too aggressive and would create noisy, low-signal build failures. -->
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Warn/Info Noise</title></head>
+<body>
+<h1>Settings</h1>
+<p>Theme: default</p>
+<script>
+console.info('App initialized in v2 compatibility mode');
+console.warn('theme.accentColor not set in config, falling back to default (#4a90d9)');
+</script>
+</body>
+</html>

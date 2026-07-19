@@ -1,0 +1,20 @@
+<!-- FIXTURE: horizontal overflow that only appears after a user interaction (button click) | GROUND TRUTH: the page is clean on initial load at any width, but clicking "Show details" injects a wide, unwrapped element that busts document width. A static single-pass load check (even one that waits for network idle) never clicks anything, so it reports a false PASS while real users who click the button get a broken layout. -->
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Overflow After Click</title>
+<style>
+ body{margin:0;font-family:sans-serif;padding:16px;}
+ #details{display:none; white-space: nowrap; background:#fee; border:1px solid #c66; padding:8px;}
+</style>
+</head>
+<body>
+<h1>Order #48213</h1>
+<button id="btn">Show details</button>
+<div id="details">Tracking reference: 1Z999AA10123456784-EXPEDITED-FREIGHT-MANIFEST-SEGMENT-0007-DO-NOT-WRAP-THIS-LINE-EVER</div>
+<script>
+document.getElementById('btn').addEventListener('click', function(){
+  document.getElementById('details').style.display = 'block';
+});
+</script>
+</body>
+</html>

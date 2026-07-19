@@ -1,0 +1,20 @@
+<!-- FIXTURE: a real error is thrown, caught by try/catch, and silently swallowed — nothing is logged, nothing reaches window.onerror, but the UI is left broken | GROUND TRUTH: this is arguably the hardest case for any automated runtime-error gate, because there is genuinely nothing to observe — no console output, no uncaught exception, no unhandledrejection. Yet the "Recent orders" section never renders and is permanently stuck on "Loading…", which any human tester would immediately flag as broken. This demonstrates that a clean console is necessary but not sufficient evidence of runtime correctness; a gate limited to error/console observation cannot catch this class of bug at all. -->
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Swallowed Error</title></head>
+<body>
+<h1>Recent orders</h1>
+<div id="orders">Loading…</div>
+<script>
+function renderOrders() {
+  var orders = getOrdersFromStore(); // getOrdersFromStore is not defined -> throws
+  document.getElementById('orders').innerHTML = orders.map(function(o){ return o.id; }).join(', ');
+}
+try {
+  renderOrders();
+} catch (e) {
+  // intentionally swallowed: no console.log, no console.error, no rethrow
+}
+</script>
+</body>
+</html>

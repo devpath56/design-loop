@@ -1,0 +1,12 @@
+<!-- FIXTURE: FALSE-POSITIVE BAIT — a legitimate console.log used for debugging/telemetry output | GROUND TRUTH: this is normal, harmless developer output (an init message, a feature-flag dump) that ships to production in plenty of real codebases and indicates nothing is wrong. A gate that treats ANY console output (including console.log) as a runtime failure would false-positive on this extremely common, benign pattern and train developers to strip all logging rather than fix real bugs. -->
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Console.log (benign)</title></head>
+<body>
+<h1>Welcome</h1>
+<p>Your dashboard is ready.</p>
+<script>
+console.log('[app] initialized', { version: '2.4.1', featureFlags: ['newNav', 'darkMode'] });
+</script>
+</body>
+</html>

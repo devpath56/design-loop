@@ -1,0 +1,47 @@
+{
+  "$comment": "Effects available to the design loop. Adding an effect is a data edit here plus a folder — the skill reads this file and needs no changes.",
+  "version": 1,
+  "effects": [
+    {
+      "id": "marble-ink-jpn",
+      "name": "Marble Ink (Japanese)",
+      "aliases": [
+        "marble ink", "marble ink japan", "marble ink japanese", "suminagashi",
+        "ink marbling", "japanese marbling", "mesh gradient", "liquid gradient",
+        "ink in water", "marbled background"
+      ],
+      "summary": "Animated mesh gradient — domain-warped fBm noise with a cursor-driven force field. Reads as ink floated on water.",
+      "surface": "background",
+      "dir": "effects/marble-ink-jpn",
+      "global": "effects/marble-ink-jpn/dist/marble-ink.global.js",
+      "entry": "effects/marble-ink-jpn/src/index.js",
+      "webComponent": "effects/marble-ink-jpn/src/web-component.js",
+      "react": "effects/marble-ink-jpn/src/react/index.jsx",
+      "build": "node effects/marble-ink-jpn/build.mjs",
+      "className": "MarbleInk",
+      "tag": "marble-ink",
+      "presets": ["ember", "tide", "moss", "ash", "dusk"],
+      "options": {
+        "palette": "preset name | 4 hex stops | {dark,light}",
+        "theme": "auto | dark | light",
+        "warp": "0..1 (0.55)",
+        "speed": "0..1 (0.35)",
+        "grain": "dither (0.022)",
+        "vignette": "0..1 (1)",
+        "interactive": "bool (true)",
+        "pointerGain": "0..1 (1)",
+        "dprCap": "number (1.5)",
+        "autoPause": "bool (true)",
+        "respectReducedMotion": "bool (true)",
+        "fallbackBackground": "css background | null"
+      },
+      "gateRisks": [
+        "contrast: text over the gradient can drop below 4.5:1 on bright frames — a scrim is mandatory, not optional",
+        "overflow: canvas must be position:fixed/absolute inset-0, never a sized block in flow",
+        "pointer-events: canvas must be pointer-events:none or it eats every click beneath it",
+        "console: over file:// the origin is null and ES-module imports are CORS-blocked — prototypes MUST use the `global` build, not `entry`. Verified: <script type=module> fails the gate, <script src> passes."
+      ],
+      "cost": "one fullscreen triangle, 5-octave fBm x3 per pixel; dprCap 1.5 and autoPause on by default"
+    }
+  ]
+}

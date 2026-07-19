@@ -1,0 +1,23 @@
+<!-- FIXTURE: horizontal overflow introduced by content injected 1500ms after load | GROUND TRUTH: the page is clean at the moment "network idle" fires (file:// pages issue no network requests, so idle fires almost immediately after load), then a setTimeout(1500ms) injects a wide unbroken table row simulating a slow client-side render (e.g. a lazily-hydrated widget). A gate that stops observing shortly after idle misses this. DELAY: 1500ms. -->
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Delayed Content Overflow</title>
+<style>
+ body{margin:0;font-family:sans-serif;padding:16px;}
+ table{border-collapse:collapse;}
+ td{border:1px solid #ccc;padding:4px 8px;white-space:nowrap;}
+</style>
+</head>
+<body>
+<h1>Live feed</h1>
+<div id="feed">Loading…</div>
+<script>
+setTimeout(function(){
+  var html = '<table><tr>';
+  for (var i = 0; i < 40; i++) { html += '<td>col-' + i + '-2024-Q3-metric</td>'; }
+  html += '</tr></table>';
+  document.getElementById('feed').innerHTML = html;
+}, 1500);
+</script>
+</body>
+</html>

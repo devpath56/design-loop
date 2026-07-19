@@ -1,0 +1,129 @@
+<!-- FIXTURE: the canonical AI landing-page template — centered hero, 3 equal feature cards, CTA band, footer, single default sans face at default weight | GROUND TRUTH: SLOP. This is gate 3 (3-equal-column card grid), gate 6 (centered-everything hero, auto-fail), gate 8 (Hero->3 features->CTA->footer structural fingerprint), and anti-patterns.md "Inter-everywhere" and "full-viewport centred hero" all in one page. Contrast is flawless (ink #1a1a1a on white #ffffff = 17.4:1 body; every button/link is a real named control) so the deterministic gate passes clean — nothing here trips axe, overflow, or console checks. It should fail hard on the structural audit. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flowstate — Get more done</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; overflow-x: clip; }
+  body {
+    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-weight: 400;
+    color: #1a1a1a;
+    background: #ffffff;
+    line-height: 1.55;
+  }
+  img, svg { max-width: 100%; height: auto; display: block; }
+  a { color: inherit; }
+  .nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 32px; border-bottom: 1px solid #e5e5e5;
+  }
+  .nav__brand { font-weight: 700; font-size: 1.1rem; }
+  .nav__links { display: flex; gap: 24px; list-style: none; margin: 0; padding: 0; }
+  .nav__links a { text-decoration: none; font-size: 0.95rem; }
+  .nav__cta {
+    background: #1a1a1a; color: #ffffff; border: none; border-radius: 8px;
+    padding: 10px 18px; font-size: 0.95rem; cursor: pointer;
+  }
+  .nav__cta:focus-visible, a:focus-visible, button:focus-visible {
+    outline: 2px solid #1a1a1a; outline-offset: 2px;
+  }
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 32px; gap: 20px;
+  }
+  .hero h1 { font-size: clamp(2rem, 5vw, 3.25rem); margin: 0; max-width: 20ch; }
+  .hero p { max-width: 55ch; color: #4a4a4a; font-size: 1.1rem; margin: 0; }
+  .hero .cta { display: flex; gap: 12px; }
+  .btn-primary {
+    background: #1a1a1a; color: #ffffff; border: none; border-radius: 8px;
+    padding: 14px 26px; font-size: 1rem; cursor: pointer;
+  }
+  .btn-secondary {
+    background: #ffffff; color: #1a1a1a; border: 1px solid #1a1a1a; border-radius: 8px;
+    padding: 14px 26px; font-size: 1rem; cursor: pointer;
+  }
+  .features {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+    max-width: 1100px; margin: 0 auto; padding: 64px 32px;
+  }
+  .feature-card {
+    border: 1px solid #e5e5e5; border-radius: 8px; padding: 28px; text-align: center;
+  }
+  .feature-card__icon {
+    width: 48px; height: 48px; margin: 0 auto 16px; border-radius: 8px;
+    background: #f2f2f2; display: flex; align-items: center; justify-content: center;
+  }
+  .feature-card h3 { margin: 0 0 8px; font-size: 1.15rem; }
+  .feature-card p { margin: 0; color: #4a4a4a; font-size: 0.95rem; }
+  .cta-band {
+    text-align: center; padding: 64px 32px; background: #f7f7f7;
+  }
+  .cta-band h2 { margin: 0 0 12px; font-size: 1.75rem; }
+  .cta-band p { margin: 0 0 24px; color: #4a4a4a; }
+  .footer {
+    text-align: center; padding: 32px; color: #6b6b6b; font-size: 0.85rem;
+    border-top: 1px solid #e5e5e5;
+  }
+</style>
+</head>
+<body>
+  <nav class="nav" aria-label="Primary">
+    <div class="nav__brand">Flowstate</div>
+    <ul class="nav__links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="#docs">Docs</a></li>
+      <li><a href="#about">About</a></li>
+    </ul>
+    <button class="nav__cta" type="button">Get started</button>
+  </nav>
+
+  <section class="hero">
+    <h1>Everything you need, in one place</h1>
+    <p>Flowstate helps your team plan, track, and ship work without switching tools. Start free, no credit card required.</p>
+    <div class="cta">
+      <button class="btn-primary" type="button">Start free</button>
+      <button class="btn-secondary" type="button">Watch demo</button>
+    </div>
+  </section>
+
+  <section class="features" id="features" aria-label="Features">
+    <article class="feature-card">
+      <div class="feature-card__icon" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>
+      </div>
+      <h3>Plan with clarity</h3>
+      <p>Organize every project into clear, trackable milestones your whole team can see.</p>
+    </article>
+    <article class="feature-card">
+      <div class="feature-card__icon" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>
+      </div>
+      <h3>Track in real time</h3>
+      <p>See status updates the moment they happen, without asking for a status update.</p>
+    </article>
+    <article class="feature-card">
+      <div class="feature-card__icon" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="2"><path d="M4 12h16M12 4v16"/></svg>
+      </div>
+      <h3>Ship with confidence</h3>
+      <p>Ship changes knowing every dependency and blocker was already accounted for.</p>
+    </article>
+  </section>
+
+  <section class="cta-band">
+    <h2>Ready to get started?</h2>
+    <p>Join teams who plan, track, and ship with Flowstate.</p>
+    <button class="btn-primary" type="button">Start free</button>
+  </section>
+
+  <footer class="footer">
+    <p>&copy; 2026 Flowstate. All rights reserved.</p>
+  </footer>
+</body>
+</html>

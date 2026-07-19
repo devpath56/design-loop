@@ -1,0 +1,15 @@
+<!-- FIXTURE: uncaught error thrown 500ms after load, i.e. after typical "network idle" fires on a file:// page | GROUND TRUTH: file:// pages issue no network requests, so a "wait for network idle" strategy resolves almost immediately after DOMContentLoaded — well before this timer fires. A gate that stops listening for window.onerror once idle is reached, or that closes the page shortly after, reports a false PASS on a page that genuinely throws. DELAY: 500ms. -->
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Delayed Error 500ms</title></head>
+<body>
+<h1>Dashboard</h1>
+<p>Widgets initializing…</p>
+<script>
+setTimeout(function(){
+  var config = null;
+  console.log(config.refreshInterval); // throws: Cannot read properties of null
+}, 500);
+</script>
+</body>
+</html>

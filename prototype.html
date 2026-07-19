@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- The states THIS artifact owes, not a universal checklist. "empty" is dropped: a sign-in
+     form holds no collection to be empty (NN/g scopes empty states to data screens). "locked"
+     is added: the credibly-missing auth state is the lockout/rate-limit after failed attempts,
+     which carries security weight. See design.md sources. -->
+<meta name="ui-states" content="loading,error,success,locked">
+<title>Prototype: sign in</title>
+<style>
+  :root{ --bg:#f4f5f7; --card:#fff; --ink:#1a1f26; --muted:#5b6470; --line:#e4e7ec; --accent:#4f46e5; --danger:#8c1f3d; --ok:#2f7d5b; }
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;display:grid;place-items:center;background:var(--bg);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:28px;width:min(360px,92vw);
+    box-shadow:0 1px 2px rgba(16,24,40,.05),0 8px 24px rgba(16,24,40,.06)}
+  h1{font-size:20px;margin:0 0 4px;text-wrap:balance;text-align:center}
+  .sub{font-size:14px;color:var(--muted);text-align:center;margin:0 0 24px}
+  label{display:block;font-size:12px;font-weight:600;margin:0 0 8px}
+  input{width:100%;border:1px solid #98a2b3;border-radius:9px;padding:12px;font-size:14px;margin-bottom:16px}
+  .cta{width:100%;border:0;border-radius:9px;padding:11px;background:var(--accent);color:#fff;font-size:14px;font-weight:600;cursor:pointer}
+  .row{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+  .icon{border:1px solid var(--line);background:#fff;border-radius:9px;width:38px;height:38px;cursor:pointer;font-size:16px}
+  /* INTERACTIVE STATES. The audit's standing critical was that none of these existed —
+     every control was inert until clicked. Durations sit at 150ms, inside the 80-400ms band
+     and matching the interval used for list-level transitions in shipped mail clients.
+     :focus-visible rather than :focus so a mouse click does not draw a ring the mouse user
+     did not ask for, while the keyboard user still gets one. */
+  .cta, .icon, input { transition: background-color 150ms ease-out, border-color 150ms ease-out,
+                                   box-shadow 150ms ease-out, opacity 150ms ease-out; }
+  /* Every hover pairs colour with a second, non-colour cue. Colour alone vanishes in forced-
+     colours mode and is invisible to a large share of users, so it cannot be the only signal.
+     box-shadow rather than transform or border-width: neither reflows the layout. */
+  .cta:hover { background:#4238c9; box-shadow:0 2px 8px rgba(79,70,229,.35); }
+  .cta:active { background:#3a30ad; }
+  .cta:disabled { opacity:.65; cursor:default; }
+  .icon:hover { border-color:#98a2b3; background:#f8fafc; box-shadow:0 1px 4px rgba(16,24,40,.14); }
+  .icon:active { background:#eef2f6; }
+  input:hover { border-color:#7c8598; box-shadow:0 1px 3px rgba(16,24,40,.10); }
+  input:focus { border-color:var(--accent); }
+  /* One focus treatment, authored, on every control — not the browser default, whose
+     contrast against these colours is unverified and which differs per platform. */
+  .cta:focus-visible, .icon:focus-visible, input:focus-visible, a:focus-visible,
+  [data-state]:focus-visible {
+    outline:2px solid var(--accent); outline-offset:2px;
+  }
+
+  /* LOADING. The button carries its own state rather than a separate spinner: the thing you
+     pressed is the thing that reports back, so attention never has to move. */
+  [data-state="loading"] .cta { pointer-events:none; }
+  .spin { display:inline-block; width:13px; height:13px; margin-right:8px;
+    border:2px solid rgba(255,255,255,.4); border-top-color:#fff; border-radius:50%;
+    vertical-align:-2px; animation:spin 700ms linear infinite; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  /* linear is correct HERE and nowhere else — a spinner models constant rotation, and easing
+     it would imply a start and an end that the operation does not have. */
+  @media (prefers-reduced-motion: reduce) { .spin { animation:none; opacity:.6; } }
+
+  /* SUCCESS. Quiet: the work is done, so the screen should stop asking for attention. */
+  [data-state="success"]{
+    border-left:2px solid var(--ok); padding:4px 0 4px 12px; margin:0 0 20px -14px;
+    font-size:14px; line-height:1.45;
+  }
+  [data-state="success"] b{ color:var(--ok); font-weight:600; display:block; margin-bottom:2px; }
+
+  /* ERROR STATE.
+     Colour: #992d4a — a red pulled toward the page's indigo accent rather than stock
+     crimson, per design.md "neutrals are chosen, not defaulted". 7.42:1 on the card.
+     Treatment: a hanging rule, not a filled banner. design.md says spend boldness in ONE
+     place, and that place is already the CTA; a red block would compete with the one
+     element the user needs to press next.
+     The rule sits OUTSIDE the text column so the message keeps the card's left margin —
+     the error reads as an annotation on the form, not a separate object dropped on top. */
+  [data-state="error"]{
+    border-left:2px solid var(--danger);
+    padding:4px 0 4px 12px;
+    margin:0 0 20px -14px;
+    font-size:14px;
+    line-height:1.45;
+    color:var(--ink);
+  }
+  [data-state="error"] b{ color:var(--danger); font-weight:600; display:block; margin-bottom:2px; }
+  [data-state="error"] a{ color:var(--danger); }
+  /* Every state is display:block when shown; the matrix drives them via [hidden], which a
+     UA stylesheet sets at the LOWEST specificity — any author display rule silently wins.
+     Declaring it here means hiding actually hides. */
+  [data-state][hidden]{ display:none !important; }
+  /* Effect surface. pointer-events:none is non-negotiable — without it the canvas
+     swallows every click on the form beneath. */
+  #fx-bg{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+  /* Everything else must establish a stacking context above the canvas. */
+  body > *:not(#fx-bg){position:relative;z-index:1}
+  /* The card is the scrim: text never sits on the moving field, it sits on opaque white.
+     Border and shadow are lifted because the card now floats on ink, not on flat grey. */
+  .card{border-color:rgba(16,24,40,.10);
+    box-shadow:0 1px 2px rgba(16,24,40,.06),0 12px 32px rgba(16,24,40,.14)}
+</style>
+</head>
+<body>
+  <canvas id="fx-bg" aria-hidden="true"></canvas>
+  <main class="card" data-states="loading">
+    <h1>Sign in</h1>
+    <p class="sub">Welcome back. Enter your details to continue.</p>
+
+    <!-- role="alert" so a screen reader announces it on appearance without the user having
+         to go looking. The copy is deliberately generic: naming which field was wrong would
+         confirm whether an account exists for that address (user enumeration). -->
+    <p data-state="error" role="alert" hidden>
+      <b>We couldn't sign you in</b>
+      Check your email and password, or <a href="#reset">reset it</a>.
+    </p>
+    <p data-state="success" role="status" hidden>
+      <b>You're signed in</b>
+      Taking you to your inbox.
+    </p>
+    <div class="row">
+      <span style="font-size:14px;color:var(--muted)">Continue with a provider</span>
+      <button class="icon" aria-label="Continue with a provider"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="8" cy="15" r="4"/><path d="M10.8 12.2 20 3m-3 3 2 2m-4 0 2 2"/></svg></button>
+    </div>
+    <label for="email">Email</label>
+    <input id="email" type="email" placeholder="you@example.com">
+    <label for="pw">Password</label>
+    <input id="pw" type="password" placeholder="••••••••">
+    <button class="cta">Sign in</button>
+  </main>
+  <!-- global build, not the ESM entry: over file:// the origin is null and module
+       imports are CORS-blocked, which fails the gate's no-console-errors check. -->
+  <script src="./effects/marble-ink-jpn/dist/marble-ink.global.js"></script>
+  <script>
+    const ink = new MarbleInk(document.getElementById('fx-bg'), {
+      // Suminagashi is sumi ink floated on water: ink and paper, with indigo as a single
+      // note. Derived from design.md's accent (#4f46e5) by biasing the NEUTRALS toward it
+      // — not by ramping the accent itself, which would land on the purple→blue gradient
+      // design.md names as a slop tell. Darkest → brightest.
+      palette: ['#151a26', '#3f4757', '#9aa3b5', '#eceef3'],
+      warp: 0.5,      // ≤0.6 — higher reads as a screensaver
+      speed: 0.28,    // slow drift; this is a sign-in page, not a demo
+      vignette: 1,    // darkens the edges, keeps the card the brightest thing on screen
+      fallbackBackground: 'linear-gradient(160deg,#eceef3 0%,#9aa3b5 55%,#3f4757 100%)'
+    });
+
+    // The field STILLS when the form errors.
+    // This is the audit's own remedy for "decorative structure that encodes nothing true":
+    // motion now carries state instead of running regardless. Stillness pulls attention to
+    // the message — the eye is drawn to what changes, and here what changes is everything
+    // else stopping. Rejected the alternative (agitate the ink on error) because adding
+    // motion next to the thing you need someone to READ competes with it.
+    const err = document.querySelector('[data-state="error"]');
+    if (err && ink) {
+      const sync = () => (err.hidden ? ink.resume?.() : ink.pause?.());
+      new MutationObserver(sync).observe(err, { attributes: true, attributeFilter: ['hidden'] });
+      sync();
+    }
+
+    // ---- Reaching the states.
+    // A state you cannot get to is a state only the checker sees. Two routes:
+    //
+    // 1. The real path — pressing Sign in fails, because there is no auth behind this.
+    //    That is the honest prototype behaviour, and it means the unhappy state is
+    //    reachable the same way a user would reach it.
+    // 2. ?state=<name> — a direct link, for review and for the workbench iframe.
+    //
+    // Editing either field clears the error, which is how a real form behaves: the message
+    // describes the last attempt, not a permanent condition.
+    const show = (name) => document.querySelectorAll('[data-state]').forEach((el) => {
+      el.hidden = el.getAttribute('data-state') !== name;
+    });
+
+    // The happy path is a real path: press Sign in, watch it work, then land somewhere.
+    // A loading state you can only reach by editing the DOM is a state only the checker sees.
+    const cta = document.querySelector('.cta');
+    const label = cta.textContent;
+    const setLoading = (on) => {
+      cta.disabled = on;
+      cta.innerHTML = on ? '<span class="spin" aria-hidden="true"></span>Signing in…' : label;
+      document.body.toggleAttribute('data-loading', on);
+    };
+
+    cta?.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (cta.disabled) return;
+      show(null);
+      setLoading(true);
+      // 900ms is a stand-in for a network round trip, not a design choice — the DESIGN
+      // decision is that the button reports its own state for however long that takes.
+      setTimeout(() => {
+        setLoading(false);
+        // Alternates so both outcomes are reachable without editing anything.
+        const ok = document.body.toggleAttribute('data-alt');
+        show(ok ? 'success' : 'error');
+        const el = document.querySelector(`[data-state="${ok ? 'success' : 'error'}"]`);
+        el?.setAttribute('tabindex', '-1');
+        el?.focus();
+      }, 900);
+    });
+
+    const _unused = () => {
+      show('error');
+      // Move focus to the message so a keyboard or screen-reader user lands on the reason
+      // rather than being left on a button that appeared to do nothing.
+      err?.setAttribute('tabindex', '-1');
+      err?.focus();
+    };
+
+    document.querySelectorAll('input').forEach((i) =>
+      i.addEventListener('input', () => { if (err) err.hidden = true; }));
+
+    const wanted = new URLSearchParams(location.search).get('state');
+    if (wanted) show(wanted);
+  </script>
+</body>
+</html>

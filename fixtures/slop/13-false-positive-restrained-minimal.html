@@ -1,0 +1,41 @@
+<!-- FIXTURE: deliberately plain, quiet, restrained page — meant to bait a naive "boring = generic" detector | GROUND TRUTH: NOT SLOP. This is a single long column of left-aligned prose, one weight of one serif face, no cards, no icons, no gradient, no CTA button styled as a pill, no hero at all in the conventional sense — just a masthead, a dateline, and running text, the way a well-set essay or a letter looks. A naive slop-detector trained to flag "generic AI landing page" shapes might mistakenly flag this for having *few* structural devices (no cards, no numbered steps, no eyebrow) or for its plainness, mistaking "boring" for "templated." But absence of ornament is not the same as absence of intent: the measure is held to 68ch, the rule under the masthead is a single hairline that does real work (separating dateline from body), the one link in the piece is inline and unstyled beyond an underline, and there is no filler copy — every sentence carries information specific to this piece. This is the aesthetic of a well-typeset letter or a Kinfolk/Monocle-style editorial page, not a "safe default because nothing was decided." Contrast computed: ink #1c1917 on stone-50 #fafaf9 = 16.74:1. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A note on the March closure</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; overflow-x: clip; }
+  body {
+    font-family: Georgia, "Iowan Old Style", "Times New Roman", serif;
+    color: #1c1917; background: #fafaf9; line-height: 1.7;
+  }
+  a { color: #1c1917; }
+  a:focus-visible { outline: 2px solid #1c1917; outline-offset: 2px; }
+  .page { max-width: 68ch; margin: 0 auto; padding: 80px 24px 96px; }
+  .masthead { font-size: 1rem; letter-spacing: 0.02em; margin: 0 0 4px; }
+  .dateline { color: #57534e; font-size: 0.9rem; margin: 0 0 24px; }
+  hr { border: none; border-top: 1px solid #d6d3cd; margin: 0 0 40px; }
+  h1 { font-size: 1.6rem; font-weight: 400; margin: 0 0 28px; line-height: 1.3; }
+  p { margin: 0 0 20px; font-size: 1.05rem; }
+  p:last-child { margin-bottom: 0; }
+  .signoff { margin-top: 40px; font-style: italic; }
+</style>
+</head>
+<body>
+  <div class="page">
+    <p class="masthead">Ridgeline Pottery</p>
+    <p class="dateline">A note posted February 2026</p>
+    <hr>
+    <h1>We are closing the storefront for March</h1>
+    <p>The wheel room floods every spring when the snowmelt runs down the hill behind the studio, and this year we're finally doing the drainage work instead of mopping around it. That means the storefront will be closed for the month of March.</p>
+    <p>Online orders placed before February 28th will ship as usual. Anything placed after that date will go out the first week of April, once the floor is dry and the shelves are back where they belong.</p>
+    <p>If you're local and have a piece on the drying rack that needs picking up, come by before the 28th — after that the building will be hard to get into for a few weeks.</p>
+    <p>We'll post here again once the room is dry and the wheels are back in place. Thank you for being patient with a very old building.</p>
+    <p class="signoff">— Dana, at the wheel</p>
+    <p><a href="#archive">Read earlier notes from the studio</a></p>
+  </div>
+</body>
+</html>

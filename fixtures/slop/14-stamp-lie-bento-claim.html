@@ -1,0 +1,79 @@
+<!-- FIXTURE: a CSS macrostructure stamp claims "Bento Grid" while the rendered page is plainly a centered hero + three equal cards + CTA + footer | GROUND TRUTH: SLOP, and the stamp itself is a second, independent lie worth catching. Per slop-test gate 20/32, Hallmark outputs are required to carry a `/* Hallmark · macrostructure: <name> · ... */` stamp naming the actual structural pattern used, specifically so repeat runs in a project can diversify. This page's stamp claims Bento Grid (an asymmetric mosaic of differently-sized tiles) but the DOM is the exact canonical template from fixture 01 — one hero, three same-size cards in a row, one CTA band, one footer. A checker that only reads the stamp and trusts it would wrongly conclude this page is structurally novel; a checker that reads the actual markup would catch both the underlying template-fingerprint problem AND the fact that the artifact is lying about what it is. Contrast computed: ink #1a1a1a on white #ffffff = 17.4:1, same palette as fixture 01. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parcelwise — Shipping rates, compared instantly</title>
+<style>
+  /* Hallmark · macrostructure: Bento Grid · tiles=6, spans=irregular, accent=corner-only */
+  /* Hallmark · pre-emit critique: P4 H4 E3 S3 R4 V2 */
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; overflow-x: clip; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: #1a1a1a; background: #ffffff; line-height: 1.55;
+  }
+  img, svg { max-width: 100%; height: auto; display: block; }
+  a:focus-visible, button:focus-visible { outline: 2px solid #1a1a1a; outline-offset: 2px; }
+  .hero {
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; text-align: center; padding: 32px; gap: 20px;
+  }
+  .hero h1 { font-size: clamp(2rem, 5vw, 3.25rem); margin: 0; max-width: 20ch; }
+  .hero p { max-width: 55ch; color: #4a4a4a; font-size: 1.1rem; margin: 0; }
+  .btn-primary {
+    background: #1a1a1a; color: #ffffff; border: none; border-radius: 8px;
+    padding: 14px 26px; font-size: 1rem; cursor: pointer;
+  }
+  .features {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+    max-width: 1100px; margin: 0 auto; padding: 64px 32px;
+  }
+  .feature-card {
+    border: 1px solid #e5e5e5; border-radius: 8px; padding: 28px; text-align: center;
+  }
+  .feature-card h3 { margin: 0 0 8px; font-size: 1.15rem; }
+  .feature-card p { margin: 0; color: #4a4a4a; font-size: 0.95rem; }
+  .cta-band { text-align: center; padding: 64px 32px; background: #f7f7f7; }
+  .cta-band h2 { margin: 0 0 12px; font-size: 1.75rem; }
+  .cta-band p { margin: 0 0 24px; color: #4a4a4a; }
+  .footer {
+    text-align: center; padding: 32px; color: #6b6b6b; font-size: 0.85rem;
+    border-top: 1px solid #e5e5e5;
+  }
+</style>
+</head>
+<body>
+  <section class="hero">
+    <h1>Shipping rates, compared instantly</h1>
+    <p>Parcelwise checks every carrier's rate the moment you enter a package, so you never overpay for a box that could've shipped cheaper.</p>
+    <button class="btn-primary" type="button">Compare rates free</button>
+  </section>
+
+  <section class="features" aria-label="Features">
+    <article class="feature-card">
+      <h3>Every carrier, one screen</h3>
+      <p>USPS, UPS, FedEx, and regional carriers checked in the same request.</p>
+    </article>
+    <article class="feature-card">
+      <h3>No account needed to quote</h3>
+      <p>Get a rate before you decide whether Parcelwise is worth signing up for.</p>
+    </article>
+    <article class="feature-card">
+      <h3>Address correction included</h3>
+      <p>Catches bad addresses before the label prints, not after it bounces.</p>
+    </article>
+  </section>
+
+  <section class="cta-band">
+    <h2>Stop guessing which carrier is cheapest</h2>
+    <p>Free to compare. Pay only when you print a label.</p>
+    <button class="btn-primary" type="button">Compare rates free</button>
+  </section>
+
+  <footer class="footer">
+    <p>&copy; 2026 Parcelwise.</p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,33 @@
+{
+  "ts": "2026-07-19T06:46:04.961Z",
+  "fixtures": 46,
+  "certain": {
+    "TP": 8,
+    "TN": 15,
+    "FP": 1,
+    "FN": 2
+  },
+  "grey": {
+    "total": 20,
+    "agreed": 10
+  },
+  "errors": 0,
+  "blindSpots": [
+    {
+      "file": "fixtures/layout/error-after-network-idle-2s.html",
+      "probe": "uncaught ReferenceError thrown via setTimeout 2000ms after load",
+      "whyHard": "tests whether the gate's error-observation window has any meaningful upper bound beyond 'network idle'; a short fixed observation period misses a 2s-delayed throw"
+    },
+    {
+      "file": "fixtures/layout/overflow-768-breakpoint.html",
+      "probe": "horizontal overflow that exists only in a width range between the two tested breakpoints (600-1000px, e.g. 768px/900px)",
+      "whyHard": "gate samples exactly two widths (375, 1280); a media query scoped to the untested range is invisible to a two-point test matrix"
+    }
+  ],
+  "falseAlarms": [
+    {
+      "file": "fixtures/slop/02-purple-blue-gradient-hero.html",
+      "probe": "purple-to-blue linear-gradient hero background on an otherwise plain white page, white centered headline over the gradient"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+<!-- FIXTURE: semi-transparent text (rgba(0,0,0,0.4)) rendered over a repeating black/white striped background | GROUND TRUTH: FAILS 1.4.3 wherever the text overlaps a dark stripe (the 40%-opacity black text composited onto black is still nearly black-on-black, contrast near 1:1). Over the white stripes it is closer to acceptable. Because the effective rendered color depends on alpha-compositing against a non-uniform ancestor, a static single-color contrast algorithm cannot resolve one "background color" for the element and typically reports incomplete/cannot-tell rather than fail. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contrast: rgba text over busy striped background</title>
+</head>
+<body style="background:#ffffff; font-family: Arial, sans-serif; padding: 0; margin:0;">
+<div style="background-image: repeating-linear-gradient(45deg, #000000 0px, #000000 24px, #ffffff 24px, #ffffff 48px); padding: 50px 40px; min-height: 260px; box-sizing: border-box;">
+  <h1 style="color: rgba(0,0,0,0.4); font-size:22px; margin-top:0; background:transparent;">Semi-transparent text over a striped background</h1>
+  <p style="color: rgba(0,0,0,0.4); font-size:16px; font-weight:400; max-width:600px; background:transparent;">
+  This text uses rgba(0,0,0,0.4) as its color and sits over alternating black and white diagonal stripes. Wherever a glyph lands on a black stripe, the composited result is very dark text on a black surface -- effectively invisible. Wherever a glyph lands on a white stripe, the composited result is a mid-gray on white, which is marginal at best.
+  </p>
+</div>
+</body>
+</html>

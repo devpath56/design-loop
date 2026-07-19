@@ -1,0 +1,18 @@
+<!-- FIXTURE: an icon-only button whose aria-label is a generic, self-referential word ("button") that names the element's role, not its purpose | GROUND TRUTH: FAILS the intent of WCAG 2.4.6 / 4.1.2 -- a screen reader announces only "button, button", giving the user zero information about what activating it does. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Useless accessible name: generic label</title>
+</head>
+<body style="background:#ffffff; font-family: Arial, sans-serif; padding: 40px; margin:0;">
+<h1 style="color:#000000; font-size:20px;">Accessible-name probe: generic/useless label</h1>
+<p style="color:#333; max-width:520px;">The checkout action below has a non-empty accessible name, so a name-presence check passes it. Read the label text: it tells you nothing about what the button does.</p>
+<button aria-label="button" style="font-size:18px; padding:12px 20px; background:#1a56db; color:#ffffff; border:none; border-radius:6px;">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false">
+    <path d="M5 12h14M13 6l6 6-6 6"/>
+  </svg>
+</button>
+</body>
+</html>
