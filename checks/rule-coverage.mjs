@@ -51,8 +51,33 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   console.log(`\n  control: 'Contrast' is LINKED         ${cLinked ? 'ok' : 'FAIL'}`);
   console.log(`  control: a fabricated rule is REMINDER ${cReminder ? 'ok' : 'FAIL'}`);
   console.log(`\n  ${linked}/${rules.length} rules have a checker; ${rules.length - linked} are prose-only (REMINDER)`);
+
+  // ── RATCHET (forward-only): coverage may not DROP below the committed baseline ──────────
+  // Trident's impact ratchet applied to the census. Without it, design.md can silently outgrow its
+  // enforcement: add a rule with no checker, or delete a checker, and the count falls with every
+  // gate still green. Raising the baseline is explicit (--set-baseline), never silent.
+  const blIdx = process.argv.indexOf('--baseline'); // overridable so the durability control can fire it
+  const BASELINE = blIdx >= 0 ? process.argv[blIdx + 1] : 'design-coverage-baseline.json';
+  if (process.argv.includes('--set-baseline')) {
+    fs.writeFileSync(BASELINE, JSON.stringify({ linked, total: rules.length }) + '\n');
+    console.log(`  baseline SET: ${linked}/${rules.length} linked (explicit)`);
+    process.exit(0);
+  }
+  let dropped = false;
+  if (fs.existsSync(BASELINE)) {
+    const b = JSON.parse(fs.readFileSync(BASELINE, 'utf8'));
+    if (linked < b.linked) {
+      dropped = true;
+      console.log(`  RATCHET BROKEN: coverage fell ${b.linked}→${linked} — a rule lost its checker, or a rule was added with none`);
+    } else {
+      console.log(`  ratchet: ${linked} >= baseline ${b.linked} (held)`);
+    }
+  } else {
+    console.log(`  no baseline yet — run --set-baseline to seed the ratchet`);
+  }
+
   const bad = (!cLinked || !cReminder) ? 1 : 0;
-  console.log(`RESULT: ${bad ? 'CONTROL FAIL' : 'reported'}`);
-  // Non-strict never fails on coverage (it is a backlog report); --strict fails if controls break.
-  process.exit(STRICT && bad ? 1 : 0);
+  console.log(`RESULT: ${bad ? 'CONTROL FAIL' : dropped ? 'RATCHET BROKEN' : 'reported'}`);
+  // Non-strict is a backlog report; --strict fails on a broken control OR a coverage regression.
+  process.exit(STRICT && (bad || dropped) ? 1 : 0);
 }

@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>clean fixture — a POSITIVE control for craft-evals</title>
+<!-- The positive half of the control: the SAME four checks that must FAIL on slop.html must PASS
+     here. If a check fails this page, it is over-eager (false positive) and craft-controls.mjs goes
+     red. Together the two fixtures pin each check between a known-good and a known-bad input. -->
+<style>
+  body { font-family: system-ui, sans-serif; margin: 40px; }
+  h1 { font-size: 32px; font-weight: 700; margin: 0 0 12px; }   /* size + weight rank */
+  p  { font-size: 16px; font-weight: 400; margin: 0 0 8px; }    /* 16/20/32 = ratios 1.25, 1.6 */
+  .sub { font-size: 20px; font-weight: 400; }
+  .cta { font-size: 16px; font-weight: 700; transition: opacity 200ms ease-out; }  /* eased, in-band */
+</style>
+</head>
+<body>
+  <h1>Sign in</h1>
+  <p class="sub">Welcome back. Enter your details to continue.</p>
+  <p>Three sizes, two weights, eased motion, no spaced dash.</p>
+  <button class="cta">Continue</button>
+</body>
+</html>

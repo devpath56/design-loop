@@ -57,6 +57,14 @@ check('audit-brief requires a next-improvement entry (progression driver)', /nex
 const gateSrc = fs.readFileSync(path.join(HERE, 'design-gate.mjs'), 'utf8');
 check('design-gate still invokes craft-delta (progression wiring is durable)', /craft-delta\.mjs/.test(gateSrc));
 
+// the rule-coverage RATCHET is durable: a baseline above current coverage must break --strict. If
+// the ratchet code is reverted, this control goes red (prove-durable flagged the ratchet ungated).
+const hi = path.join(tmp, 'hi-baseline.json');
+fs.writeFileSync(hi, JSON.stringify({ linked: 99, total: 32 }));
+const rc = spawnSync('node', ['checks/rule-coverage.mjs', '--strict', '--baseline', hi], { encoding: 'utf8', cwd: path.join(HERE, '..') });
+check('rule-coverage ratchet FIRES when coverage is below baseline (exit 1)', rc.status === 1);
+check('  and reports RATCHET BROKEN', /RATCHET BROKEN/.test(rc.stdout));
+
 fs.rmSync(tmp, { recursive: true, force: true });
 console.log(`\nRESULT: ${fails ? `${fails} FAIL` : 'PASS'}`);
 process.exit(fails ? 1 : 0);

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>slop fixture — a NEGATIVE control for craft-evals</title>
+<!-- This page is deliberately bad. It exists to prove the craft checks DISCRIMINATE: each defect
+     below MUST be caught by a specific craft-evals check. If a check ever passes this page, that
+     check is vacuous (hardcoded PASS / measuring nothing) and craft-controls.mjs goes red. This is
+     the fixture half of Trident's mutation discipline: a gate with no input that must fail is not
+     a gate. Do not "fix" this file — its failures are the test. -->
+<style>
+  /* linear motion → motion-easing MUST fail (200ms keeps motion-duration in-band on purpose,
+     so only the easing check trips, not the duration one) */
+  .cta { transition: opacity 200ms linear; }
+</style>
+</head>
+<body>
+  <!-- EIGHT distinct font sizes → type-scale MUST fail (a held scale is <= 6 steps).
+       ALL weight 400 (nothing bold) → hierarchy-weight MUST fail (one weight = lever unused). -->
+  <p style="font-size:10px">ten</p>
+  <p style="font-size:13px">thirteen</p>
+  <p style="font-size:17px">seventeen</p>
+  <p style="font-size:22px">twenty two</p>
+  <p style="font-size:29px">twenty nine</p>
+  <p style="font-size:38px">thirty eight</p>
+  <p style="font-size:50px">fifty</p>
+  <!-- spaced em dash in visible copy → copy-no-dash MUST fail -->
+  <p style="font-size:66px">Sign in — welcome back</p>
+  <button class="cta">Continue</button>
+</body>
+</html>

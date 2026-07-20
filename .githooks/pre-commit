@@ -13,7 +13,7 @@
 # Install:  cp .githooks/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
 
 staged=$(git diff --cached --name-only)
-surface=$(printf '%s\n' "$staged" | grep -E '\.html$|^design\.md$' | grep -vE '^(workbench-|design-)')
+surface=$(printf '%s\n' "$staged" | grep -E '\.html$|^design\.md$' | grep -vE '^(workbench-|design-|fixtures/)')
 lesson=$(printf '%s\n' "$staged" | grep -cE '^design-lessons\.jsonl$')
 
 if [ -n "$surface" ] && [ "$lesson" -eq 0 ]; then
