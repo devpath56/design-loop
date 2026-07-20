@@ -23,6 +23,13 @@
 //
 // Run:  node checks/doctrine-gate.mjs [--render] [--strict] [--today YYYY-MM-DD]
 import fs from 'node:fs';
+import crypto from 'node:crypto';
+
+// Run ids are DERIVED, not stored: design-gate computes 'r' + sha1(ts + target). To resolve a
+// `run` evidence citation we must recompute the same id per row. Reading a stored `.id` (which
+// does not exist) meant no run evidence could EVER resolve. The cold audit missed this because
+// it tested with synthetic ids; found while trying to cite a real run.
+const runIdOf = (row) => 'r' + crypto.createHash('sha1').update((row.ts ?? '') + (row.target ?? '')).digest('hex').slice(0, 8);
 
 const argv = process.argv.slice(2);
 const STRICT = argv.includes('--strict');
@@ -108,7 +115,7 @@ export function controls() {
 // ── main ──────────────────────────────────────────────────────────────────────
 if (import.meta.url === `file://${process.argv[1]}`) {
   const entries = readJsonl('doctrine.jsonl');
-  const runIds = new Set(readJsonl('design-runs.jsonl').map((r) => r.id).filter(Boolean));
+  const runIds = new Set(readJsonl('design-runs.jsonl').map(runIdOf));
   const problems = checkDoctrine(entries, runIds);
 
   console.log(`== design doctrine gate ==\n`);
