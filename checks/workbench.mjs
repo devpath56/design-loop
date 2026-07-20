@@ -257,8 +257,17 @@ const html = `<!doctype html>
   .bar select:focus-visible,.bar button:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
   .ctl{display:flex;align-items:center;gap:5px}
   .doctrine{font:600 12px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.02em;color:var(--acc);
-    text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:7px 11px;white-space:nowrap}
+    background:none;cursor:pointer;border:1px solid var(--line);border-radius:8px;padding:7px 11px;white-space:nowrap}
   .doctrine:hover,.doctrine:focus-visible{border-color:var(--acc);outline:none}
+  /* doctrine overlay: opens the log table over the workbench, no navigation */
+  .ov{position:fixed;inset:0;z-index:60;background:rgb(0 0 0 / .45);display:flex;align-items:center;justify-content:center;padding:24px}
+  .ov[hidden]{display:none}
+  .ovcard{background:var(--card);border:1px solid var(--line);border-radius:14px;width:min(860px,100%);max-height:82vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 60px rgb(0 0 0 / .3)}
+  .ovbar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--line)}
+  .ovbar b{font-size:13px;letter-spacing:-.01em}
+  .ovbar button{background:none;border:0;color:var(--mut);cursor:pointer;font-size:15px;line-height:1;padding:4px}
+  .ovbar button:hover{color:var(--ink)}
+  .ov iframe{border:0;width:100%;flex:1;min-height:320px;background:var(--card)}
   .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
   .bar button:hover,.bar button:focus-visible{border-color:var(--acc);color:var(--ink);outline:none}
   .bar button[aria-pressed=true]{color:var(--acc);border-color:var(--acc)}
@@ -420,6 +429,7 @@ const html = `<!doctype html>
     .grip{display:none}}  /* panel stacks below here; the side-boundary grip would dangle a full-height line through the content */
 </style></head><body>
 <div class="grip" id="grip" title="drag to resize the panel" aria-hidden="true"></div>
+<div class="ov" id="ov" hidden><div class="ovcard"><div class="ovbar"><b>design doctrine</b><button type="button" id="ovx" aria-label="close">✕</button></div><iframe id="ovf" title="design doctrine" src="about:blank"></iframe></div></div>
 <div class="stage">
   <div class="bar">
     <label class="ctl"><span class="sr">prototype</span>
@@ -436,7 +446,7 @@ const html = `<!doctype html>
     <label class="ctl"><span class="sr">state</span>
       <select id="st" title="jump to a state">${stateOpts}</select>
     </label>
-    <a class="doctrine" href="doctrine.html" title="your contrarian design opinions, and your craft growth">◆ doctrine</a>
+    <button type="button" class="doctrine" id="doc" title="your contrarian design opinions, and your craft growth">◆ doctrine</button>
     <span class="sp">
       <button type="button" id="sz" title="phone / desktop" aria-label="toggle phone or desktop width" aria-pressed="false">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -521,6 +531,17 @@ document.getElementById('tg').addEventListener('click',function(e){
   var hid=document.body.classList.toggle('collapsed');
   e.currentTarget.setAttribute('aria-pressed', hid?'false':'true');
 });
+// doctrine overlay: open the log table over the workbench, close on ✕ / backdrop / Esc
+(function(){
+  var ov=document.getElementById('ov'), f=document.getElementById('ovf'), b=document.getElementById('doc'), x=document.getElementById('ovx');
+  if(!ov||!b) return;
+  function open(){ f.src='doctrine.html'; ov.hidden=false; }
+  function close(){ ov.hidden=true; f.src='about:blank'; }
+  b.addEventListener('click',open);
+  x.addEventListener('click',close);
+  ov.addEventListener('click',function(e){ if(e.target===ov) close(); });
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&!ov.hidden) close(); });
+})();
 // draggable panel: restore saved width, then drag the grip to resize (clamped, persisted)
 var sw=localStorage.getItem('wb-w'); if(sw) document.body.style.setProperty('--w',sw);
 (function(){

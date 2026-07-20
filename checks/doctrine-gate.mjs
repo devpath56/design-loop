@@ -162,40 +162,40 @@ function renderView(entries) {
     <div class="strip" title="your feedback axes over the last ${teach.length} run(s). The 6 are the parts of a defensible opinion.">${strip}</div>
     <div class="count"><b>${live.length}</b><span>opinion${live.length === 1 ? '' : 's'}</span></div>
   </div>`;
-  const card = (e) => `<article class="d ${e._derivedStatus === 'needs-review' ? 'stale' : ''}">
-    <div class="conf">${esc(e.confidence)}${e._derivedStatus === 'needs-review' ? ' · review overdue' : ''}</div>
-    <h2>${esc(e.claim)}</h2>
-    <p class="vs"><span>vs</span> ${esc(e.contradicts)}</p>
-    <ul class="ev">${(e.evidence || []).map((v) => `<li>${esc(v.type)}: ${esc(v.ref)}${v.cite ? ` — ${esc(v.cite)}` : ''}</li>`).join('')}</ul>
-  </article>`;
+  // A log table, not prose cards (per D-001: tables, not paragraphs). One row per opinion.
+  const row = (e) => `<tr class="${e._derivedStatus === 'needs-review' ? 'stale' : ''}">
+    <td class="cl">${esc(e.claim)}</td>
+    <td class="vs">${esc(e.contradicts)}</td>
+    <td class="ev">${(e.evidence || []).map((v) => `<span title="${esc(v.cite || '')}">${esc(v.ref)}</span>`).join(' · ')}</td>
+    <td class="cf">${esc(e.confidence)}${e._derivedStatus === 'needs-review' ? ' · review' : ''}</td>
+  </tr>`;
+  const table = live.length
+    ? `<table class="dt"><thead><tr><th>opinion</th><th>vs</th><th>evidence</th><th>conf</th></tr></thead>
+       <tbody>${live.map(row).join('')}</tbody></table>`
+    : '<p class="empty">No doctrine yet. A contrarian claim + evidence, or the gate rejects it.</p>';
   const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>design doctrine</title><style>
 :root{--bg:#fbfbfa;--card:#fff;--ink:#161a19;--mut:#5a6562;--line:#e4e8e6;--acc:#0f6b5c;--warn:#8a6a1a}
 @media(prefers-color-scheme:dark){:root{--bg:#0e1211;--card:#161b1a;--ink:#e9edeb;--mut:#9aa7a3;--line:#243029;--acc:#4ecdb0;--warn:#d3b25f}}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,sans-serif;padding:48px 20px}
-.w{max-width:760px;margin:0 auto}h1{font-size:26px;letter-spacing:-.02em;margin:0 0 4px}
-.sub{color:var(--mut);margin:0 0 32px}
-.d{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;margin:0 0 14px}
-.d.stale{border-color:var(--warn)}
-.conf{font:600 11px/1 ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--acc);margin:0 0 10px}
-.d.stale .conf{color:var(--warn)}
-.d h2{font-size:19px;line-height:1.25;margin:0 0 10px;letter-spacing:-.01em}
-.vs{color:var(--mut);margin:0 0 12px;font-size:14.5px}.vs span{font:600 11px/1 ui-monospace,monospace;text-transform:uppercase;color:var(--mut)}
-.ev{margin:0;padding-left:0;list-style:none;font:13px/1.6 ui-monospace,monospace;color:var(--mut)}
-.empty{color:var(--mut);border:1px dashed var(--line);border-radius:14px;padding:28px;text-align:center}
-.growth{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;
-  border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:16px 0;margin:0 0 26px}
-.strip{display:flex;flex-wrap:wrap;gap:14px;font:12.5px/1 ui-monospace,SFMono-Regular,Menlo,monospace}
-.ax{color:var(--mut);letter-spacing:.01em;white-space:nowrap}
-.ax.on{color:var(--acc)}.ax.mid{color:var(--ink)}
-.count{display:flex;align-items:baseline;gap:7px;white-space:nowrap}
-.count b{font-size:30px;font-weight:640;letter-spacing:-.02em;line-height:1}
-.count span{color:var(--mut);font-size:13px}
-</style></head><body><div class="w">
-<h1>design doctrine</h1><p class="sub">Devansh's own contrarian, evidence-backed calls. Strongest first. design.md is what the field recommends; this is what he claims.</p>
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 system-ui,sans-serif;padding:16px}
+.growth{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:0 0 12px;margin:0 0 12px;border-bottom:1px solid var(--line)}
+.strip{display:flex;flex-wrap:wrap;gap:12px;font:12px/1 ui-monospace,SFMono-Regular,Menlo,monospace}
+.ax{color:var(--mut);white-space:nowrap}.ax.on{color:var(--acc)}.ax.mid{color:var(--ink)}
+.count{display:flex;align-items:baseline;gap:6px;white-space:nowrap}.count b{font-size:24px;font-weight:640;line-height:1;letter-spacing:-.02em}.count span{color:var(--mut);font-size:12px}
+.dt{width:100%;border-collapse:collapse;font-size:13px}
+.dt th{text-align:left;font:600 10px/1 ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);padding:0 10px 8px;border-bottom:1px solid var(--line)}
+.dt td{padding:11px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.dt tr:last-child td{border-bottom:0}
+.dt .cl{color:var(--ink);font-weight:500;width:42%}
+.dt .vs{color:var(--mut);width:32%}
+.dt .ev{font:12px/1.5 ui-monospace,monospace;color:var(--acc);white-space:nowrap}
+.dt .cf{font:600 11px/1 ui-monospace,monospace;text-transform:uppercase;color:var(--mut);white-space:nowrap}
+.dt tr.stale td{background:color-mix(in oklab,var(--warn) 8%,transparent)}.dt tr.stale .cf{color:var(--warn)}
+.empty{color:var(--mut);padding:20px 0}
+</style></head><body>
 ${growth}
-${live.length ? live.map(card).join('\n') : '<div class="empty">No doctrine yet. Add a contrarian, evidence-backed opinion to doctrine.jsonl.</div>'}
-</div></body></html>`;
+${table}
+</body></html>`;
   fs.writeFileSync('doctrine.html', html);
   console.log('  rendered → doctrine.html');
 }
