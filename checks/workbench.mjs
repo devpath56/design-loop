@@ -58,7 +58,13 @@ try {
   const src = fs.readFileSync(target, 'utf8');
   const owed = (src.match(/<meta\s+name=["']ui-states["']\s+content=["']([^"']+)["']/i) || [])[1];
   if (owed) REQUIRED_STATES = owed.split(',').map((s) => s.trim()).filter(Boolean);
-  declared = [...new Set([...src.matchAll(/data-state=["']([^"']+)["']/g)].map((m) => m[1]))];
+  // Scrape data-state from MARKUP only. Scripts contain runtime selectors like
+  // `[data-state="${name}"]` (prototype.html:253) — matching those pulls the literal ${name} in as a
+  // bogus state and emits a dead <option value="${name}"> that the state-switch gate then fails on.
+  // Strip scripts first, and keep only real state names (state-matrix uses the same rule).
+  const markup = src.replace(/<script[\s\S]*?<\/script>/gi, '');
+  declared = [...new Set([...markup.matchAll(/data-state=["']([^"']+)["']/g)].map((m) => m[1]))]
+    .filter((s) => /^[a-z][a-z0-9_-]*$/i.test(s));
 } catch {}
 const stateOpts = ['<option value="">default</option>']
   .concat(REQUIRED_STATES.map((st) => {

@@ -16,7 +16,8 @@
 // Usage:  node checks/verify-render.mjs [--target prototype.html]
 import { chromium } from 'playwright';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
+import { spawnSync, spawn } from 'node:child_process';
+import net from 'node:net';
 import fs from 'node:fs';
 import { load, pairSteps, AXES } from './lib/runs.mjs';
 
@@ -70,12 +71,24 @@ const coverage = steps.filter((s) => s.run.id && (s.run.ts || '') >= COVERAGE_FR
   missing: CHECKERS.filter((c) => !c.has(s)),
 }));
 
+// Serve over http, never file://. A file:// iframe of a sibling is a dead snapshot (CF-070/CF-074):
+// its opaque origin blocks the state-switch and effect scripts do not load, so testing there
+// false-fails a workbench that works fine served. The loop runs over http, so the gate must too.
+const port = await new Promise((res) => {
+  const s = net.createServer();
+  s.listen(0, () => { const p = s.address().port; s.close(() => res(p)); });
+});
+const server = spawn('python3', ['-m', 'http.server', String(port)], { cwd: process.cwd(), stdio: 'ignore' });
+const stopServer = () => { try { server.kill(); } catch {} };
+process.on('exit', stopServer);
+await new Promise((r) => setTimeout(r, 600)); // let the server bind
+
 const browser = await chromium.launch();
 const problems = [];
 const chromeMissing = [];
 try {
   const page = await (await browser.newContext({ viewport: { width: 1280, height: 900 } })).newPage();
-  await page.goto(`file://${path.resolve(wb)}`, { waitUntil: 'networkidle' });
+  await page.goto(`http://localhost:${port}/${wb}`, { waitUntil: 'networkidle' });
 
   // ── CHROME. Every prototype iterated in the loop must render inside the workbench shell:
   // the nav bar (name switch, state dropdown, width toggle, theme toggle, panel toggle) and
@@ -160,6 +173,7 @@ try {
   }
 } finally {
   await browser.close();
+  stopServer();
 }
 
 const checked = steps.filter((s) => s.run.id).length;
