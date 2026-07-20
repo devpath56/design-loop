@@ -59,68 +59,57 @@ const covered = [
   'accessible names, roles, labels',
 ];
 
-const brief = `Read ${target} and design.md.
-
-Invoke the \`hallmark\` skill and run \`hallmark audit\` on ${target}.
+const brief = `Read ${target} and design.md, render it (drive \`?state=<name>\` for each declared state),
+and read it ONCE. Do NOT open other repo files, do NOT invoke a design skill, do NOT re-run the
+scripts. Budget: aim for <= 6 tool calls. You are judging the RESIDUE the deterministic checkers
+cannot reach, not re-auditing from scratch — the cheap tier already ran and its results are below.
 
 You are auditing the ARTIFACT only. You cannot see why any choice was made, and should not ask.
 
 ## ALREADY MEASURED: do not RE-DERIVE these, but DO challenge them
-Deterministic checkers ran first. Their results are below WITH the method used. These are
-measurements, **not settled facts**: a check can pass vacuously, and one here already did:
-an earlier version of the focus check reported PASS because the browser draws a default ring,
-while the page authored no focus styling at all.
-
-Your job on this list is not to repeat it. It is to ask, for each one:
-**does the stated method actually support the stated claim?**
-If it does not, that IS a finding. Report it as \`gate: "evaluator-wrong: <check name>"\` with
-severity major, and say what the method misses.
+These are measurements WITH their method, **not settled facts**: a check can pass vacuously, and
+one here already did — the focus check once reported PASS off the browser's default ring while the
+page authored no focus styling. For each, ask: **does the stated method actually support the claim?**
+If not, that IS a finding: \`gate: "evaluator-wrong: <check>"\`, severity major, say what it misses.
 
 ${(craft?.results ?? []).map(line).join('\n') || '- (craft-evals produced no results)'}
 
 ${(instr ?? []).slice(0, 6).map((e) => `- [${e.type}] ${e.claim} — ${e.measured}`).join('\n')}
 
-Machine-covered categories: do not file a DUPLICATE finding here, but a finding that the
-measurement itself is wrong or incomplete is always in scope:
+Do not duplicate these machine-covered categories (a finding that the MEASUREMENT is wrong is still in scope):
 ${covered.map((c) => `  · ${c}`).join('\n')}
+Interrogate first: any PASS a browser default could satisfy; any PASS where "nothing happened"
+looks identical to "the right thing happened"; any INFO that is really an untested condition.
 
-Highest-risk vacuous passes to interrogate first:
-  · any PASS that could be satisfied by a browser default rather than by the page's own code
-  · any PASS where "nothing happened" would produce the same result as "the right thing happened"
-  · any INFO that is really an untested condition wearing a neutral label
-
-## SPEND YOUR JUDGEMENT HERE INSTEAD
-Only on what no script can reach:
-- **Composition**: does the layout have a structure, or is it defaults stacked vertically?
-- **Motivated vs decorative**: does every visual device encode something true about the
-  product or the content? Name any that does not.
-- **Hierarchy**: do the type sizes and weights actually rank things in the order that
-  matters, or are they just different?
-- **Copy**: does it say the true thing, in the fewest words, at the moment it is needed?
-- **Model fit**: does the structure match how someone thinks about this task?
-- **What is missing**: a state, an affordance, or a piece of information that should exist
-  and does not. Absence is the thing scripts are worst at.
-
-Restating a measurement as your own discovery is waste. Disproving one is the most valuable
-thing you can return.
+## YOUR TWO JOBS — spend judgement only where no script can reach
+1. **DEFECTS the scripts can't see.** Composition (structure vs defaults stacked vertically),
+   motivated-vs-decorative (every device encodes something true — name any that doesn't),
+   hierarchy (do sizes/weights rank what MATTERS, or are they merely different), copy (true thing,
+   fewest words, right moment), model-fit (structure matches how the user thinks), and above all
+   **what is MISSING** (a state, affordance, or piece of information that should exist) — absence is
+   what scripts are worst at. Plus any evaluator-wrong. Only real, nameable tells; no padding.
+2. **THE NEXT IMPROVEMENT.** The single highest-leverage change that would make this SUBSTANTIALLY
+   better, not merely un-broken — the one move you would make next to raise the craft ceiling. A
+   loop that only removes defects plateaus; this is what drives it forward.
 
 Do NOT edit anything.
 
-Return ONLY a JSON array, no prose, no markdown fence:
+Return ONLY a JSON array (no prose, no fence). List your defects, AND always include exactly one
+entry with gate \`"next-improvement"\` (severity minor) whose \`fix\` is that single highest-leverage
+upgrade, concrete enough to act on:
 [{"gate":"<named tell>","severity":"critical|major|minor","where":"${target}:<lines>","fix":"<one line>"}]
-Return [] if genuinely clean.`;
+If genuinely defect-free, return just the one next-improvement entry.`;
 
 console.log(blind
-  ? `Read ${target} and design.md.
+  ? `Read ${target} and design.md, render it, and read it once.
 
-Invoke the \`hallmark\` skill and run \`hallmark audit\` on ${target}.
-
-This is a BLIND CONTROL RUN. You are deliberately given no prior measurements. Report
-everything you find, including things a script might also catch. The point is to detect what
-the automated checkers are missing, so overlap is expected and useful here.
+This is a BLIND CONTROL RUN — deliberately given no prior measurements. Report everything you
+find, including things a script might also catch: the point is to detect what the automated
+checkers MISS, so overlap is expected and useful here. Do not invoke a design skill.
 
 Do NOT edit anything.
 
-Return ONLY a JSON array, no prose, no markdown fence:
+Return ONLY a JSON array (no prose, no fence). Include exactly one gate \`"next-improvement"\`
+(severity minor) with the single highest-leverage upgrade:
 [{"gate":"<named tell>","severity":"critical|major|minor","where":"${target}:<lines>","fix":"<one line>"}]`
   : brief);
