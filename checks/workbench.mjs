@@ -256,6 +256,9 @@ const html = `<!doctype html>
     border:1px solid var(--line);border-radius:6px;padding:3px 6px;cursor:pointer}
   .bar select:focus-visible,.bar button:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
   .ctl{display:flex;align-items:center;gap:5px}
+  .doctrine{font:600 12px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.02em;color:var(--acc);
+    text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:7px 11px;white-space:nowrap}
+  .doctrine:hover,.doctrine:focus-visible{border-color:var(--acc);outline:none}
   .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
   .bar button:hover,.bar button:focus-visible{border-color:var(--acc);color:var(--ink);outline:none}
   .bar button[aria-pressed=true]{color:var(--acc);border-color:var(--acc)}
@@ -433,6 +436,7 @@ const html = `<!doctype html>
     <label class="ctl"><span class="sr">state</span>
       <select id="st" title="jump to a state">${stateOpts}</select>
     </label>
+    <a class="doctrine" href="doctrine.html" title="your contrarian design opinions, and your craft growth">◆ doctrine</a>
     <span class="sp">
       <button type="button" id="sz" title="phone / desktop" aria-label="toggle phone or desktop width" aria-pressed="false">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -571,6 +575,15 @@ console.log(`  ${outFile}: ${target} + ${steps.length} run(s) in the panel`);
 if (state.linked) console.log(`  ${state.linked} screenshot(s) linked, not embedded. Open from the project dir`);
 console.log(`  open: file://${path.resolve(outFile)}`);
 if (siblings.length > 1) console.log(`  ${siblings.length} prototypes discoverable from the nav dropdown`);
+
+// ── keep the doctrine view fresh ──────────────────────────────────────────────
+// The nav links to doctrine.html; its growth strip reads the last 5 teaching records, so it
+// goes stale unless re-rendered. Regenerate it here (non-blocking) so the pill always opens
+// a current view. Skipped under WB_NOSYNC so sibling re-renders do not repeat it.
+if (!process.env.WB_NOSYNC) {
+  spawnSync(process.execPath, [path.join(path.dirname(new URL(import.meta.url).pathname), 'doctrine-gate.mjs'), '--render'],
+    { stdio: 'ignore' });
+}
 
 // ── auto-sync every other switcher ────────────────────────────────────────────
 // The prototype dropdown bakes its sibling list at render time, so rendering one used to

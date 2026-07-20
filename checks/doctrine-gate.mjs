@@ -141,6 +141,27 @@ function renderView(entries) {
   const order = { strong: 0, working: 1, tentative: 2 };
   const live = entries.filter((e) => e.status !== 'retired').sort((a, b) => (order[a.confidence] ?? 9) - (order[b.confidence] ?? 9));
   const esc = (s) => String(s ?? '').replace(/[&<>]/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
+
+  // Growth (option B, last 5): opinions earned + a craft strip. The 6 axes ARE the components
+  // of a defensible opinion, so a filling strip = feedback getting sharper. Scored from the
+  // last 5 teaching records: yes=1, partial=.5, no=0, averaged per axis.
+  const AXES = ['mechanism', 'evidence', 'constraint', 'open_space', 'acceptance', 'actionable'];
+  const teach = readJsonl('design-teaching.jsonl')
+    .filter((t) => t.feedback?.rubric)
+    .sort((a, b) => String(a.ts ?? '').localeCompare(String(b.ts ?? ''))).slice(-5);
+  const scoreOf = (ax) => {
+    const vs = teach.map((t) => ({ yes: 1, partial: 0.5, no: 0 }[t.feedback.rubric[ax]] ?? 0));
+    return vs.length ? vs.reduce((a, b) => a + b, 0) / vs.length : 0;
+  };
+  const dot = (s) => (s >= 0.6 ? '●' : s >= 0.3 ? '◐' : '○');
+  const strip = AXES.map((a) => {
+    const s = scoreOf(a);
+    return `<span class="ax ${s >= 0.6 ? 'on' : s >= 0.3 ? 'mid' : ''}">${dot(s)} ${a.replace('_', ' ')}</span>`;
+  }).join('');
+  const growth = `<div class="growth">
+    <div class="strip" title="your feedback axes over the last ${teach.length} run(s). The 6 are the parts of a defensible opinion.">${strip}</div>
+    <div class="count"><b>${live.length}</b><span>opinion${live.length === 1 ? '' : 's'}</span></div>
+  </div>`;
   const card = (e) => `<article class="d ${e._derivedStatus === 'needs-review' ? 'stale' : ''}">
     <div class="conf">${esc(e.confidence)}${e._derivedStatus === 'needs-review' ? ' · review overdue' : ''}</div>
     <h2>${esc(e.claim)}</h2>
@@ -162,8 +183,17 @@ body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,sans
 .vs{color:var(--mut);margin:0 0 12px;font-size:14.5px}.vs span{font:600 11px/1 ui-monospace,monospace;text-transform:uppercase;color:var(--mut)}
 .ev{margin:0;padding-left:0;list-style:none;font:13px/1.6 ui-monospace,monospace;color:var(--mut)}
 .empty{color:var(--mut);border:1px dashed var(--line);border-radius:14px;padding:28px;text-align:center}
+.growth{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:16px 0;margin:0 0 26px}
+.strip{display:flex;flex-wrap:wrap;gap:14px;font:12.5px/1 ui-monospace,SFMono-Regular,Menlo,monospace}
+.ax{color:var(--mut);letter-spacing:.01em;white-space:nowrap}
+.ax.on{color:var(--acc)}.ax.mid{color:var(--ink)}
+.count{display:flex;align-items:baseline;gap:7px;white-space:nowrap}
+.count b{font-size:30px;font-weight:640;letter-spacing:-.02em;line-height:1}
+.count span{color:var(--mut);font-size:13px}
 </style></head><body><div class="w">
 <h1>design doctrine</h1><p class="sub">Devansh's own contrarian, evidence-backed calls. Strongest first. design.md is what the field recommends; this is what he claims.</p>
+${growth}
 ${live.length ? live.map(card).join('\n') : '<div class="empty">No doctrine yet. Add a contrarian, evidence-backed opinion to doctrine.jsonl.</div>'}
 </div></body></html>`;
   fs.writeFileSync('doctrine.html', html);
