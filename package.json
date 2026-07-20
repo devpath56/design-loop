@@ -19,11 +19,12 @@
     "craft-delta": "node checks/craft-delta.mjs",
     "craft-controls": "node checks/craft-controls.mjs",
     "design-rat": "node checks/design-rat.mjs",
+    "teach": "node checks/teach-gate.mjs",
     "audit-brief": "node checks/audit-brief.mjs",
     "track": "node checks/track.mjs",
     "verify-render": "node checks/verify-render.mjs",
     "doctrine": "node checks/doctrine-gate.mjs --render",
-    "test": "node checks/test-state-taxonomy.mjs && node checks/doctrine-gate.mjs --strict && node checks/loop-integrity.mjs --strict && node checks/check-selfgrade.mjs --strict && node checks/test-craft-delta.mjs && node checks/craft-controls.mjs && node checks/rule-coverage.mjs --strict && node checks/design-rat.mjs --gate --strict",
+    "test": "node checks/test-state-taxonomy.mjs && node checks/doctrine-gate.mjs --strict && node checks/loop-integrity.mjs --strict && node checks/check-selfgrade.mjs --strict && node checks/test-craft-delta.mjs && node checks/craft-controls.mjs && node checks/rule-coverage.mjs --strict && node checks/design-rat.mjs --gate --strict && node checks/teach-gate.mjs --strict",
     "coverage": "node checks/rule-coverage.mjs"
   },
   "devDependencies": {
