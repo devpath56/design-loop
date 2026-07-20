@@ -1,0 +1,19 @@
+{
+  "$comment": "Devansh's design doctrine: his OWN contrarian, evidence-backed design opinions. Distinct from design.md, which encodes what top designers recommend. This is what HE claims, earned from design-loop work, and gated so it never goes stale. The gate checks STRUCTURE, not genuineness: it cannot prove a claim truly opposes the mainstream (that is a labeled limit, judged by the cold audit). Built under Trident session `doctrine`, IntentCard i-3cabe709.",
+  "required": ["id", "claim", "contradicts", "evidence", "confidence", "added_on", "review_by", "status"],
+  "fields": {
+    "id": "D-### , stable",
+    "claim": "the opinion, stated as an imperative or assertion. >= 20 chars, no placeholder",
+    "contradicts": "the mainstream view this pushes against, named specifically. >= 20 chars. An entry that contradicts nothing is consensus, not doctrine",
+    "evidence": "array, >= 1. Each { type: run|cf|source, ref, cite? }. run.ref must exist in design-runs.jsonl; cf.ref matches CF-\\d+; source.ref is a URL or citation with cite text",
+    "confidence": "one of: strong, working, tentative",
+    "added_on": "ISO date",
+    "review_by": "ISO date. Past it, the entry is flagged for re-validation, never silently trusted",
+    "status": "one of: live, needs-review, retired"
+  },
+  "enum": {
+    "confidence": ["strong", "working", "tentative"],
+    "status": ["live", "needs-review", "retired"],
+    "evidence_type": ["run", "cf", "source"]
+  }
+}

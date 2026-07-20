@@ -39,7 +39,7 @@ const outFile = `workbench-${slug}.html`;
 
 // Every candidate target: html files in the root that are not generated output, plus any
 // file that already has runs logged. Selecting one navigates to ITS workbench.
-const generated = /^(design-(workbench|replay|dashboard)|workbench-)/;
+const generated = /^(design-(workbench|replay|dashboard)|workbench-|doctrine\.html)/;
 const siblings = [...new Set([
   ...fs.readdirSync('.').filter((f) => /\.html?$/i.test(f) && !generated.test(f)),
   ...runs.map((r) => r.target).filter(Boolean),
@@ -422,7 +422,11 @@ const html = `<!doctype html>
       <select id="tg-file" title="switch prototype">${siblings.map((f) => {
         const wb = `workbench-${path.basename(f).replace(/\.html?$/i, '')}.html`;
         const built = fs.existsSync(wb);
-        return `<option value="${esc(wb)}"${f === target ? ' selected' : ''}${built || f === target ? '' : ' disabled'}>${esc(f)}${built || f === target ? '' : ': no workbench yet'}</option>`;
+        // Label by the prototype's own <title>, not its filename, so you recognise it by name
+        // ("CI for design taste") not "workflow-explainer.html". Falls back to the filename.
+        let label = f;
+        try { const t = fs.readFileSync(f, 'utf8').match(/<title>([^<]+)<\/title>/i); if (t) label = t[1].trim(); } catch {}
+        return `<option value="${esc(wb)}"${f === target ? ' selected' : ''}${built || f === target ? '' : ' disabled'} title="${esc(f)}">${esc(label)}${built || f === target ? '' : ': no workbench yet'}</option>`;
       }).join('')}</select>
     </label>
     <label class="ctl"><span class="sr">state</span>
