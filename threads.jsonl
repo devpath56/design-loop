@@ -8,13 +8,13 @@
 {"id": "T-SERVER", "ask": "workbench works with no server (file://)", "kind": "auto", "probe": "grep -q srcdoc checks/workbench.mjs && grep -q protoB64 checks/workbench.mjs"}
 {"id": "T-STAGE", "ask": "prototype stage renders (blank-stage fix)", "kind": "auto", "probe": "grep -q 'id=\"fr\" title' workbench-prototype.html && ! grep -qE 'id=\"fr\"[^>]*src=' workbench-prototype.html"}
 {"id": "T-DROP", "ask": "junk state option ${ok ?} removed from switcher", "kind": "auto", "probe": "! grep -qF '${ok ?' workbench-prototype.html"}
-{"id": "T-C1C3", "ask": "Trident c1c3-audit session closed or resolved", "kind": "auto", "probe": "python3 -c \"import json,sys; r=[json.loads(l) for l in open('$HOME/Downloads/Trident-setup/prongs/prongs.jsonl'.replace('$HOME',__import__('os').path.expanduser('~'))) if l.strip()]; sys.exit(0 if 'c1c3-audit' in {x['runId'] for x in r if x.get('kind')=='close'} else 1)\""}
+{"id": "T-C1C3", "ask": "Trident c1c3-audit session closed or resolved", "kind": "auto", "probe": "python3 -c \"import json,sys,os; p=os.path.expanduser('~/Downloads/Trident-setup/prongs/prongs.jsonl'); r=[json.loads(l) for l in open(p) if l.strip()]; o={x['runId'] for x in r if x.get('kind')=='intent'}; c={x['runId'] for x in r if x.get('kind')=='close'}; sys.exit(0 if 'c1c3-audit' not in (o-c) else 1)\""}
 {"id": "T-CENSUS", "ask": "Trident census: no transport gaps", "kind": "auto", "probe": "cd $HOME/Downloads/Trident-setup && python3 tests/census.py --strict >/dev/null 2>&1"}
 {"id": "T-COVER", "ask": "design-loop runs fully checked (coverage)", "kind": "auto", "probe": "node checks/verify-render.mjs --target prototype.html >/dev/null 2>&1"}
 {"id": "T-TASKS", "ask": "completed tasks backed by a closed loop", "kind": "auto", "probe": "node checks/validate-tasks.mjs --strict >/dev/null 2>&1"}
 {"id": "T-5", "ask": "draw the missing locked state", "kind": "auto", "probe": "node checks/state-matrix.mjs prototype.html >/dev/null 2>&1"}
-{"id": "T-9", "ask": "loop piece: trigger has no impl/check", "kind": "manual", "status": "open", "note": "design-loop loop piece 1"}
-{"id": "T-10", "ask": "15 of 29 design.md rules have no check", "kind": "manual", "status": "open", "note": "design-loop loop piece 2"}
-{"id": "T-11", "ask": "nothing checks the maker did not self-grade", "kind": "manual", "status": "open", "note": "design-loop loop piece 3"}
-{"id": "T-12", "ask": "check_shape: bullet prefix exempts prose", "kind": "manual", "status": "open", "note": "decide disclose-limit vs tighten"}
+{"id": "T-9", "ask": "loop piece: trigger has no impl/check", "kind": "auto", "probe": "node checks/loop-integrity.mjs --strict >/dev/null 2>&1"}
+{"id": "T-10", "ask": "15 of 29 design.md rules have no check", "kind": "auto", "probe": "node checks/rule-coverage.mjs --strict >/dev/null 2>&1"}
+{"id": "T-11", "ask": "nothing checks the maker did not self-grade", "kind": "auto", "probe": "node checks/check-selfgrade.mjs --strict >/dev/null 2>&1"}
+{"id": "T-12", "ask": "check_shape: bullet prefix exempts prose", "kind": "auto", "probe": "grep -q BULLET_SENTENCE_LIMIT $HOME/Downloads/Trident-setup/failures/intent_gate.py && python3 $HOME/Downloads/Trident-setup/tests/selftest.py >/dev/null 2>&1"}
 {"id": "T-SWE", "ask": "explainer genuinely lands for an SWE with no context", "kind": "judge", "note": "subjective, read the artifact and rule"}
