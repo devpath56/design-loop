@@ -32,7 +32,7 @@ if (!run) {
   process.exit(2);
 }
 
-const f = { gate: '', severity: '', where: '', fix: '', clean: false, json: '' };
+const f = { gate: '', severity: '', where: '', fix: '', clean: false, json: '', grader: '' };
 for (let i = 1; i < argv.length; i++) {
   const a = argv[i];
   if (a === '--clean') f.clean = true;
@@ -41,7 +41,17 @@ for (let i = 1; i < argv.length; i++) {
   else if (a === '--where') f.where = argv[++i] ?? '';
   else if (a === '--fix') f.fix = argv[++i] ?? '';
   else if (a === '--json') f.json = argv[++i] ?? '';
+  else if (a === '--grader') f.grader = argv[++i] ?? '';
   else { console.error(`unknown flag: ${a}`); process.exit(2); }
+}
+
+// The audit only means something if it was COLD — a different agent/model than the maker. That
+// fact lived only in the transcript, so check-selfgrade could not prove it and log-audit never
+// recorded it (the exact writer/checker gap loop-piece #11 names). Require it here: no audit is
+// admissible without naming who graded it. check-selfgrade rejects a grader equal to the maker.
+if (!f.grader.trim()) {
+  console.error('need --grader "<model/agent that ran the audit>" — an audit with no attributable cold grader cannot be proven non-self-graded (check-selfgrade)');
+  process.exit(2);
 }
 
 let findings;
@@ -72,7 +82,7 @@ for (const x of findings) {
   }
 }
 
-const record = { runId, ts: new Date().toISOString(), findings };
+const record = { runId, ts: new Date().toISOString(), grader: f.grader, findings };
 fs.appendFileSync('design-audits.jsonl', JSON.stringify(record) + '\n');
 
 const crit = findings.filter((x) => x.severity === 'critical').length;
