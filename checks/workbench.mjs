@@ -265,6 +265,12 @@ const html = `<!doctype html>
   iframe.w375{width:375px} iframe.w768{width:768px}
   .panel{border-left:1px solid var(--line);background:var(--bg);overflow-y:auto;min-width:0}
   body.collapsed .panel{display:none}
+  /* drag handle on the stage/panel boundary: resizes the panel width (--w) */
+  .grip{position:absolute;top:0;right:var(--w);width:11px;height:100%;z-index:40;cursor:col-resize;transform:translateX(50%);touch-action:none}
+  .grip::after{content:"";position:absolute;top:0;left:50%;width:1px;height:100%;background:var(--line);transform:translateX(-50%);transition:background .12s,width .12s}
+  .grip:hover::after,.grip.drag::after{background:var(--acc);width:2px}
+  body.collapsed .grip{display:none}
+  @media (prefers-reduced-motion:reduce){.grip::after{transition:none}}
   .ph{position:sticky;top:0;background:var(--bg);padding:11px 13px 8px;border-bottom:1px solid var(--line);z-index:3}
   .ph h2{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--mut);margin:0;font-weight:600}
   .pb{padding:10px 13px 40px}
@@ -409,6 +415,7 @@ const html = `<!doctype html>
   @media (max-width:820px){body{grid-template-columns:1fr;grid-template-rows:1fr auto}
     .panel{border-left:0;border-top:1px solid var(--line);max-height:45vh}}
 </style></head><body>
+<div class="grip" id="grip" title="drag to resize the panel" aria-hidden="true"></div>
 <div class="stage">
   <div class="bar">
     <label class="ctl"><span class="sr">prototype</span>
@@ -505,6 +512,17 @@ document.getElementById('tg').addEventListener('click',function(e){
   var hid=document.body.classList.toggle('collapsed');
   e.currentTarget.setAttribute('aria-pressed', hid?'false':'true');
 });
+// draggable panel: restore saved width, then drag the grip to resize (clamped, persisted)
+var sw=localStorage.getItem('wb-w'); if(sw) document.body.style.setProperty('--w',sw);
+(function(){
+  var g=document.getElementById('grip'), on=false;
+  if(!g) return;
+  g.addEventListener('pointerdown',function(e){on=true;g.classList.add('drag');g.setPointerCapture(e.pointerId);e.preventDefault();});
+  g.addEventListener('pointermove',function(e){ if(!on)return; var w=Math.min(720,Math.max(260,window.innerWidth-e.clientX)); document.body.style.setProperty('--w',w+'px'); });
+  function end(){ if(!on)return; on=false; g.classList.remove('drag'); localStorage.setItem('wb-w',document.body.style.getPropertyValue('--w')); }
+  g.addEventListener('pointerup',end); g.addEventListener('pointercancel',end);
+  g.addEventListener('dblclick',function(){ document.body.style.setProperty('--w','380px'); localStorage.setItem('wb-w','380px'); });
+})();
 </script>
 </body></html>`;
 
@@ -549,6 +567,20 @@ if (state.linked) console.log(`  ${state.linked} screenshot(s) linked, not embed
 console.log(`  open: file://${path.resolve(outFile)}`);
 if (siblings.length > 1) console.log(`  ${siblings.length} prototypes discoverable from the nav dropdown`);
 
+// ── auto-sync every other switcher ────────────────────────────────────────────
+// The prototype dropdown bakes its sibling list at render time, so rendering one used to
+// freeze the others' switchers. Re-render each OTHER built workbench once so their dropdowns
+// pick up this prototype. WB_NOSYNC guards against the re-renders re-triggering each other.
+if (!process.env.WB_NOSYNC) {
+  for (const f of siblings) {
+    if (f === target) continue;
+    const wbf = `workbench-${path.basename(f).replace(/\.html?$/i, '')}.html`;
+    if (!fs.existsSync(wbf)) continue;
+    spawnSync(process.execPath, [new URL(import.meta.url).pathname, f],
+      { env: { ...process.env, WB_NOSYNC: '1' }, stdio: 'ignore' });
+  }
+}
+
 // ── verify what was just rendered ─────────────────────────────────────────────
 // Asked for explicitly: "wire verify-render into the runbook's publish step so it runs after
 // every render rather than when someone remembers." It never landed; only a comment upstream
@@ -558,7 +590,7 @@ if (siblings.length > 1) console.log(`  ${siblings.length} prototypes discoverab
 // questions (did each checker run, does the card match the prescribed shape) that have
 // answers independent of what this file believes it produced. It caught the gap-card logic
 // silently reverting on its very first run.
-{
+if (!process.env.WB_NOSYNC) {
   const vr = path.join(path.dirname(new URL(import.meta.url).pathname), 'verify-render.mjs');
   // Verify THIS target's workbench (not the default prototype), and propagate the exit code:
   // a render that drops the nav bar or control panel must fail the render, not merely print a
