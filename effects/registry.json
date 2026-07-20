@@ -42,6 +42,44 @@
         "console: over file:// the origin is null and ES-module imports are CORS-blocked — prototypes MUST use the `global` build, not `entry`. Verified: <script type=module> fails the gate, <script src> passes."
       ],
       "cost": "one fullscreen triangle, 5-octave fBm x3 per pixel; dprCap 1.5 and autoPause on by default"
+    },
+    {
+      "id": "kinetic-type",
+      "name": "Kinetic Type",
+      "aliases": [
+        "kinetic type", "kinetic typography", "text reveal", "animated text", "type animation",
+        "scramble text", "decode text", "text stagger", "letter animation", "headline animation"
+      ],
+      "summary": "Text-as-motion for headlines: per-unit rise (fade+lift+de-blur), scramble/decode, or a gentle drift. A different category from a background field — the type itself is the effect.",
+      "surface": "text",
+      "dir": "effects/kinetic-type",
+      "global": "effects/kinetic-type/dist/kinetic-type.global.js",
+      "className": "KineticType",
+      "tag": "kinetic-type",
+      "presets": [],
+      "options": {
+        "mode": "rise | scramble | wave (rise)",
+        "by": "char | word (char)",
+        "stagger": "ms between units (26)",
+        "duration": "per-unit ms, entrance (520)",
+        "easing": "css easing (cubic-bezier(.2,.7,.2,1))",
+        "distance": "px rise (18)",
+        "blur": "px initial blur (6)",
+        "start": "reveal | load | manual (reveal)",
+        "glyphs": "scramble alphabet",
+        "scrambleMs": "scramble window ms (420)",
+        "waveAmp": "px drift (6)",
+        "wavePeriod": "ms per drift cycle (2600)",
+        "respectReducedMotion": "bool (true)"
+      },
+      "gateRisks": [
+        "a11y: the real text is kept as the element's aria-label and the split spans are aria-hidden, so a screen reader hears the word not the scrambling glyphs. Built in — do not strip it.",
+        "reduced-motion: respectReducedMotion default true snaps to the final text with no motion. The `wave` mode is the one that runs continuously; never disable the snap.",
+        "layout: each unit is inline-block, which can change where a line breaks. Apply to a heading with room, not a width-constrained label.",
+        "motion: uses the Web Animations API, not CSS transitions, so it is invisible to CSS-only motion checks AND never blocks interaction. A cold auditor should still eyeball that the entrance is not sluggish.",
+        "console: use the `global` build over file:// (classic <script src>), never an ES-module import."
+      ],
+      "cost": "one WAAPI animation per unit for the one-shot entrance; `wave` keeps N infinite animations running, so use it sparingly and never on a long paragraph"
     }
   ]
 }

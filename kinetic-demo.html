@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- One state: a marketing hero has no loading/error/success to hold. "idle" is the resting state
+     it always shows. Declared so the state-matrix has something true to check rather than a
+     borrowed data-screen checklist. -->
+<meta name="ui-states" content="idle">
+<title>Kinetic Type demo</title>
+<style>
+  /* Two indigo shades on purpose: a LIGHT one for accent-coloured text on the dark ground
+     (#b7b1ff clears 4.5:1) and a DARKER one behind white CTA text (#4f46e5 clears it the other
+     way). One accent hue that has to carry both readings would fail one of them. */
+  :root{ --bg:#0b0d10; --ink:#f4f6f8; --muted:#9aa4b2; --line:#232a33;
+         --accent:#4f46e5; --accent-lite:#b7b1ff; --focus:#8b82ff; }
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;display:grid;place-items:center;background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  main{width:min(680px,92vw);padding:40px 24px;text-align:center}
+  .eyebrow{font-size:13px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-lite);margin:0 0 20px}
+  h1{font-size:clamp(40px,9vw,76px);line-height:1.02;font-weight:750;margin:0 0 20px;letter-spacing:-.02em}
+  .sub{font-size:19px;line-height:1.5;color:var(--muted);margin:0 auto 32px;max-width:34ch}
+  .cta{display:inline-block;border:0;border-radius:10px;padding:13px 22px;background:var(--accent);color:#fff;
+    font-size:15px;font-weight:650;cursor:pointer;text-decoration:none;
+    transition:box-shadow 180ms ease-out, background-color 180ms ease-out}
+  .cta:hover{background:#4338ca;box-shadow:0 6px 24px rgba(79,70,229,.45)}
+  .cta:active{background:#3730a3}
+  /* one authored focus treatment on every focusable, not the platform default */
+  .cta:focus-visible, .ghost:focus-visible{outline:2px solid var(--focus);outline-offset:3px}
+  .ghost{display:inline-block;margin-left:14px;color:var(--muted);text-decoration:none;font-size:15px;font-weight:600}
+  .ghost:hover{color:var(--ink)}
+  .row{display:flex;align-items:center;justify-content:center;gap:0}
+</style>
+</head>
+<body>
+  <main>
+    <!-- One focal string carries the motion. The eyebrow and subhead stay STILL on purpose: staging
+         directs attention to a single element, and three moving things would compete for the eye. -->
+    <div data-state="idle">
+      <p class="eyebrow">kinetic type</p>
+      <h1 id="hero">Ship the feeling</h1>
+      <p class="sub">Type that arrives in reading order, not gibberish that resolves.</p>
+      <div class="row">
+        <a class="cta" href="#start">Start building</a>
+        <a class="ghost" href="#replay" id="replay">Replay</a>
+      </div>
+    </div>
+  </main>
+
+  <!-- global build, classic script: works over file:// where module imports are CORS-blocked -->
+  <script src="./effects/kinetic-type/dist/kinetic-type.global.js"></script>
+  <script>
+    // ONE element moves: the headline rises character by character, left to right (reading order),
+    // so the motion has a direction and every frame is real, legible text. respectReducedMotion
+    // (default) snaps to the final text under prefers-reduced-motion, so that gate stays green.
+    const build = () => {
+      window.__hero = new KineticType('#hero', { mode: 'rise', by: 'char', start: 'load', stagger: 30, duration: 480 });
+    };
+    build();
+    // Replay is a real affordance, not decoration: rebuild the node and play again.
+    document.getElementById('replay').addEventListener('click', (e) => {
+      e.preventDefault();
+      window.__hero?.destroy();
+      document.getElementById('hero').textContent = 'Ship the feeling';
+      build();
+    });
+  </script>
+</body>
+</html>
