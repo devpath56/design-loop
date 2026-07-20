@@ -64,7 +64,12 @@ try {
   const src = fs.readFileSync(target, 'utf8');
   const owed = (src.match(/<meta\s+name=["']ui-states["']\s+content=["']([^"']+)["']/i) || [])[1];
   if (owed) REQUIRED_STATES = owed.split(',').map((s) => s.trim()).filter(Boolean);
-  declared = [...new Set([...src.matchAll(/data-state=["']([^"']+)["']/g)].map((m) => m[1]))];
+  // Scrape declared states from MARKUP only, not from inside <script>/<style>. The prototype's
+  // JS contains selectors like [data-state="${ok ? 'success' : 'error'}"], and matching those
+  // leaked a junk option "${ok ?" into the switcher. Strip script/style first, and require the
+  // value to be a bare identifier so a template expression can never masquerade as a state.
+  const markup = src.replace(/<script[\s\S]*?<\/script>/gi, '').replace(/<style[\s\S]*?<\/style>/gi, '');
+  declared = [...new Set([...markup.matchAll(/data-state=["']([a-z][a-z0-9_-]*)["']/gi)].map((m) => m[1]))];
 } catch {}
 const stateOpts = ['<option value="">default</option>']
   .concat(REQUIRED_STATES.map((st) => {
@@ -522,8 +527,17 @@ var PROTO = B64 ? decodeURIComponent(escape(atob(B64.textContent))) : null;
 var curState='';
 function embed(state){
   if(!PROTO) return null;
-  var inj = state ? '<scr'+'ipt>try{history.replaceState(0,"","?state='+encodeURIComponent(state)+'")}catch(e){}</scr'+'ipt>' : '';
-  return PROTO.replace(/<head[^>]*>/i, function(m){ return m+inj; });
+  // history.replaceState does NOT work on about:srcdoc (opaque origin), so the old ?state
+  // injection silently no-op'd and the stage never switched. Instead: expose the prototype's
+  // own show() globally, then call it after its script has run. srcdoc is same-origin, so this
+  // uses the prototype's REAL state logic (incl. body[data-locked]), no reimplementation.
+  // Plain string replaces, NOT regexes: this JS is emitted inside workbench.mjs's backtick
+  // template, and a regex like /<\/body>/ has its backslash eaten by the template parser,
+  // producing /</body>/ (a syntax error) in the rendered script. String replace has no
+  // backslashes to eat. Both targets occur once in the prototype.
+  var html = PROTO.replace('const show =', 'window.show =');
+  if(state) html = html.replace('</body>', '<scr'+'ipt>try{window.show('+JSON.stringify(state)+')}catch(e){}</scr'+'ipt></body>');
+  return html;
 }
 function load(state){ curState=state||''; if(PROTO){ fr.srcdoc=embed(curState); } else if(fr.getAttribute('src')){ /* url mode */ } }
 if(PROTO) fr.srcdoc = embed('');

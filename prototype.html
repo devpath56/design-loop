@@ -83,6 +83,23 @@
   }
   [data-state="error"] b{ color:var(--danger); font-weight:600; display:block; margin-bottom:2px; }
   [data-state="error"] a{ color:var(--danger); }
+
+  /* LOCKED STATE. Same hanging-rule treatment as error: this IS an error, a specific one
+     (too many failed attempts), so it inherits the same visual grammar rather than inventing
+     a second one. The colour is the same --danger, so the CTA disabling below is the second,
+     non-colour cue design.md requires state to pair with. */
+  [data-state="locked"]{
+    border-left:2px solid var(--danger);
+    padding:4px 0 4px 12px;
+    margin:0 0 20px -14px;
+    font-size:14px;
+    line-height:1.45;
+    color:var(--ink);
+  }
+  [data-state="locked"] b{ color:var(--danger); font-weight:600; display:block; margin-bottom:2px; }
+  /* The CTA reads its own state, same pattern as loading: disabled + opacity is the
+     non-colour cue, not the red rule alone. */
+  body[data-locked] .cta{ opacity:.65; cursor:default; pointer-events:none; }
   /* Every state is display:block when shown; the matrix drives them via [hidden], which a
      UA stylesheet sets at the LOWEST specificity — any author display rule silently wins.
      Declaring it here means hiding actually hides. */
@@ -110,6 +127,14 @@
     <p data-state="error" role="alert" hidden>
       <b>We couldn't sign you in</b>
       Check your email and password, or <a href="#reset">reset it</a>.
+    </p>
+    <!-- Locked reuses the error grammar (same rule, same alert role) because it IS an
+         error, just a specific one: too many failed attempts. A separate visual language
+         would suggest a different kind of problem, which invents a distinction that
+         isn't there. -->
+    <p data-state="locked" role="alert" hidden>
+      <b>Too many attempts</b>
+      Your account is locked for 15 minutes. <a href="#reset">Reset your password</a> to get back in sooner.
     </p>
     <p data-state="success" role="status" hidden>
       <b>You're signed in</b>
@@ -148,9 +173,11 @@
     // else stopping. Rejected the alternative (agitate the ink on error) because adding
     // motion next to the thing you need someone to READ competes with it.
     const err = document.querySelector('[data-state="error"]');
+    const lockedMsg = document.querySelector('[data-state="locked"]');
     if (err && ink) {
-      const sync = () => (err.hidden ? ink.resume?.() : ink.pause?.());
+      const sync = () => (err.hidden && lockedMsg?.hidden !== false ? ink.resume?.() : ink.pause?.());
       new MutationObserver(sync).observe(err, { attributes: true, attributeFilter: ['hidden'] });
+      if (lockedMsg) new MutationObserver(sync).observe(lockedMsg, { attributes: true, attributeFilter: ['hidden'] });
       sync();
     }
 
@@ -178,6 +205,15 @@
       document.body.toggleAttribute('data-loading', on);
     };
 
+    // Failed attempts accumulate across clicks, same as a real rate limiter. Three strikes
+    // is a stand-in count, not a design choice — the DESIGN decision is that lockout is
+    // reached by repetition, not by a coin flip like the error/success alternation is.
+    let fails = 0;
+    const lockCta = () => {
+      cta.disabled = true;
+      document.body.setAttribute('data-locked', '');
+    };
+
     cta?.addEventListener('click', (e) => {
       e.preventDefault();
       if (cta.disabled) return;
@@ -189,23 +225,25 @@
         setLoading(false);
         // Alternates so both outcomes are reachable without editing anything.
         const ok = document.body.toggleAttribute('data-alt');
-        show(ok ? 'success' : 'error');
-        const el = document.querySelector(`[data-state="${ok ? 'success' : 'error'}"]`);
+        if (ok) { fails = 0; show('success'); }
+        else {
+          fails += 1;
+          if (fails >= 3) { show('locked'); lockCta(); }
+          else show('error');
+        }
+        const name = ok ? 'success' : fails >= 3 ? 'locked' : 'error';
+        const el = document.querySelector(`[data-state="${name}"]`);
         el?.setAttribute('tabindex', '-1');
         el?.focus();
       }, 900);
     });
 
-    const _unused = () => {
-      show('error');
-      // Move focus to the message so a keyboard or screen-reader user lands on the reason
-      // rather than being left on a button that appeared to do nothing.
-      err?.setAttribute('tabindex', '-1');
-      err?.focus();
-    };
-
     document.querySelectorAll('input').forEach((i) =>
-      i.addEventListener('input', () => { if (err) err.hidden = true; }));
+      i.addEventListener('input', () => {
+        // Locked does not clear on input: it is a real hold, not a message describing the
+        // last attempt. Clearing it on keystroke would let typing bypass a rate limit.
+        if (err && (!lockedMsg || lockedMsg.hidden)) err.hidden = true;
+      }));
 
     const wanted = new URLSearchParams(location.search).get('state');
     if (wanted) show(wanted);
