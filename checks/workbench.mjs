@@ -413,7 +413,8 @@ const html = `<!doctype html>
   .lesson{font-size:12.5px;margin:9px 0 0;padding-left:9px;border-left:2px solid var(--acc)}
   .empty{color:var(--mut);font-size:12.5px}
   @media (max-width:820px){body{grid-template-columns:1fr;grid-template-rows:1fr auto}
-    .panel{border-left:0;border-top:1px solid var(--line);max-height:45vh}}
+    .panel{border-left:0;border-top:1px solid var(--line);max-height:45vh}
+    .grip{display:none}}  /* panel stacks below here; the side-boundary grip would dangle a full-height line through the content */
 </style></head><body>
 <div class="grip" id="grip" title="drag to resize the panel" aria-hidden="true"></div>
 <div class="stage">
