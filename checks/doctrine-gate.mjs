@@ -45,7 +45,7 @@ const readJsonl = (p) => (fs.existsSync(p)
 const blank = (v) => v == null || (typeof v === 'string' && !v.trim());
 const placeholder = (v) => blank(v) || String(v).trim().length < 20 || /^(tbd|todo|n\/?a|none|test|xxx)\b/i.test(String(v).trim());
 
-const REQUIRED = ['id', 'claim', 'contradicts', 'evidence', 'confidence', 'added_on', 'review_by', 'status'];
+const REQUIRED = ['id', 'scope', 'claim', 'contradicts', 'evidence', 'confidence', 'added_on', 'review_by', 'status'];
 const CONF = ['strong', 'working', 'tentative'];
 const STATUS = ['live', 'needs-review', 'retired'];
 
@@ -60,6 +60,7 @@ export function checkDoctrine(entries, runIds, now = today) {
     if (!/^D-\d+$/.test(e.id ?? '')) problems.push(`${at}: id must be D-###`);
     if (seen.has(e.id)) problems.push(`${at}: duplicate id`);
     seen.add(e.id);
+    if (placeholder(e.scope)) problems.push(`${at}: scope is empty or a placeholder. Name where the opinion applies`);
     if (placeholder(e.claim)) problems.push(`${at}: claim is empty or a placeholder`);
     // contrarian bar: contradicts must name a real opposing view
     if (placeholder(e.contradicts)) problems.push(`${at}: contradicts is empty/placeholder. An entry that contradicts nothing is consensus, not doctrine`);
@@ -94,7 +95,8 @@ export function checkDoctrine(entries, runIds, now = today) {
 export function controls() {
   const runs = new Set(['rABC1234']);
   const ok = {
-    id: 'D-001', claim: 'Ship the empty state only where data can be absent, not on forms',
+    id: 'D-001', scope: 'reports and explanatory writing, not just UI microcopy',
+    claim: 'Ship the empty state only where data can be absent, not on forms',
     contradicts: 'the folklore four-state checklist that puts an empty state on every screen',
     evidence: [{ type: 'run', ref: 'rABC1234' }], confidence: 'strong',
     added_on: '2026-07-19', review_by: '2026-12-31', status: 'live',
@@ -102,6 +104,7 @@ export function controls() {
   const c = [];
   const fires = (label, entry) => c.push([label, checkDoctrine([entry], runs, '2026-07-19').length > 0]);
   c.push(['accepts a well-formed contrarian+evidence entry (positive control)', checkDoctrine([ok], runs).length === 0]);
+  fires('rejects an entry with no scope', { ...ok, scope: '' });
   fires('rejects an entry that contradicts nothing', { ...ok, contradicts: '' });
   fires('rejects a placeholder contradicts', { ...ok, contradicts: 'TBD' });
   fires('rejects an entry with no evidence', { ...ok, evidence: [] });
@@ -130,72 +133,87 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   else console.log('  all entries admissible');
   if (stale.length) console.log(`\n  ${stale.length} overdue for review: ${stale.map((e) => e.id).join(', ')}`);
 
-  if (RENDER) renderView(entries);
+  if (RENDER) renderStandalone();
 
   const bad = problems.length + cf;
   console.log(`\nRESULT: ${bad ? `${bad} FAIL` : 'PASS'}`);
   process.exit(STRICT && bad ? 1 : (cf ? 1 : 0));
 }
 
-function renderView(entries) {
+// Styles for the doctrine table. Exported so the workbench can inline the SAME view into its
+// overlay instead of iframing doctrine.html (an iframe of a file:// sibling is what forced a
+// local server; inlining removes that need entirely). Selectors are prefixed .dov so they do
+// not collide when injected into the workbench.
+export const DOCTRINE_CSS = `
+.dov .growth{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:0 0 12px;margin:0 0 12px;border-bottom:1px solid var(--line)}
+.dov .strip{display:flex;flex-wrap:wrap;gap:12px;font:12px/1 ui-monospace,SFMono-Regular,Menlo,monospace}
+.dov .ax{color:var(--mut);white-space:nowrap}.dov .ax.on{color:var(--acc)}.dov .ax.mid{color:var(--ink)}
+.dov .count{display:flex;align-items:baseline;gap:6px;white-space:nowrap}.dov .count b{font-size:24px;font-weight:640;line-height:1;letter-spacing:-.02em}.dov .count span{color:var(--mut);font-size:12px}
+.dov .dt{width:100%;border-collapse:collapse;font-size:13px}
+.dov .dt th{text-align:left;font:600 10px/1 ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);padding:0 10px 8px;border-bottom:1px solid var(--line)}
+.dov .dt td{padding:12px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.dov .dt tr:last-child td{border-bottom:0}
+.dov .dt ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
+.dov .dt li{position:relative;padding-left:14px}
+.dov .dt li::before{content:"";position:absolute;left:0;top:8px;width:4px;height:4px;border-radius:1px;background:var(--line)}
+.dov .op{width:48%}
+.dov .op .sc{color:var(--mut);font:600 11px/1.35 ui-monospace,monospace}
+.dov .op .sc::before{background:var(--acc)}
+.dov .op .cl{color:var(--ink);font-weight:560;line-height:1.4}
+.dov .cw{width:44%}.dov .cw li{color:var(--mut);line-height:1.4}
+.dov .ev{width:1%;white-space:nowrap;text-align:center}
+.dov .ev b{font:600 12px/1 ui-monospace,monospace;color:var(--acc);cursor:help;border-bottom:1px dotted var(--acc)}
+.dov .dt tr.stale td{background:color-mix(in oklab,var(--warn) 8%,transparent)}
+.dov .empty{color:var(--mut);padding:20px 0}`;
+
+// The inner HTML: growth strip + the redesigned log table. No page wrapper, so it drops
+// straight into the workbench overlay (no iframe) OR into a standalone page.
+export function doctrineFragment() {
+  const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m]));
+  const entries = readJsonl('doctrine.jsonl');
+  const runIds = new Set(readJsonl('design-runs.jsonl').map(runIdOf));
+  checkDoctrine(entries, runIds); // sets _derivedStatus
   const order = { strong: 0, working: 1, tentative: 2 };
   const live = entries.filter((e) => e.status !== 'retired').sort((a, b) => (order[a.confidence] ?? 9) - (order[b.confidence] ?? 9));
-  const esc = (s) => String(s ?? '').replace(/[&<>]/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
 
-  // Growth (option B, last 5): opinions earned + a craft strip. The 6 axes ARE the components
-  // of a defensible opinion, so a filling strip = feedback getting sharper. Scored from the
-  // last 5 teaching records: yes=1, partial=.5, no=0, averaged per axis.
+  // Growth (option B, last 5): opinions earned + craft strip. The 6 axes are the parts of a
+  // defensible opinion, so a filling strip = feedback getting sharper.
   const AXES = ['mechanism', 'evidence', 'constraint', 'open_space', 'acceptance', 'actionable'];
-  const teach = readJsonl('design-teaching.jsonl')
-    .filter((t) => t.feedback?.rubric)
+  const teach = readJsonl('design-teaching.jsonl').filter((t) => t.feedback?.rubric)
     .sort((a, b) => String(a.ts ?? '').localeCompare(String(b.ts ?? ''))).slice(-5);
   const scoreOf = (ax) => {
     const vs = teach.map((t) => ({ yes: 1, partial: 0.5, no: 0 }[t.feedback.rubric[ax]] ?? 0));
     return vs.length ? vs.reduce((a, b) => a + b, 0) / vs.length : 0;
   };
   const dot = (s) => (s >= 0.6 ? '●' : s >= 0.3 ? '◐' : '○');
-  const strip = AXES.map((a) => {
-    const s = scoreOf(a);
-    return `<span class="ax ${s >= 0.6 ? 'on' : s >= 0.3 ? 'mid' : ''}">${dot(s)} ${a.replace('_', ' ')}</span>`;
-  }).join('');
-  const growth = `<div class="growth">
-    <div class="strip" title="your feedback axes over the last ${teach.length} run(s). The 6 are the parts of a defensible opinion.">${strip}</div>
-    <div class="count"><b>${live.length}</b><span>opinion${live.length === 1 ? '' : 's'}</span></div>
-  </div>`;
-  // A log table, not prose cards (per D-001: tables, not paragraphs). One row per opinion.
-  const row = (e) => `<tr class="${e._derivedStatus === 'needs-review' ? 'stale' : ''}">
-    <td class="cl">${esc(e.claim)}</td>
-    <td class="vs">${esc(e.contradicts)}</td>
-    <td class="ev">${(e.evidence || []).map((v) => `<span title="${esc(v.cite || '')}">${esc(v.ref)}</span>`).join(' · ')}</td>
-    <td class="cf">${esc(e.confidence)}${e._derivedStatus === 'needs-review' ? ' · review' : ''}</td>
-  </tr>`;
+  const strip = AXES.map((a) => { const s = scoreOf(a); return `<span class="ax ${s >= 0.6 ? 'on' : s >= 0.3 ? 'mid' : ''}">${dot(s)} ${a.replace('_', ' ')}</span>`; }).join('');
+  const growth = `<div class="growth"><div class="strip" title="your feedback axes, last ${teach.length} run(s)">${strip}</div><div class="count"><b>${live.length}</b><span>opinion${live.length === 1 ? '' : 's'}</span></div></div>`;
+
+  // Redesigned per feedback: Opinion = two bullets (scope it applies to, then the sharp claim);
+  // Conventional wisdom = the belief it fights; Evidence = near-zero, a count with the cites in
+  // its tooltip. Every character earns its space.
+  const row = (e) => {
+    const cites = (e.evidence || []).map((v) => `${v.ref}${v.cite ? ': ' + v.cite : ''}`).join('\n');
+    return `<tr class="${e._derivedStatus === 'needs-review' ? 'stale' : ''}">
+      <td class="op"><ul><li class="sc">${esc(e.scope)}</li><li class="cl">${esc(e.claim)}</li></ul></td>
+      <td class="cw"><ul><li>${esc(e.contradicts)}</li></ul></td>
+      <td class="ev"><b title="${esc(cites)}">◆${(e.evidence || []).length}</b></td>
+    </tr>`;
+  };
   const table = live.length
-    ? `<table class="dt"><thead><tr><th>opinion</th><th>vs</th><th>evidence</th><th>conf</th></tr></thead>
-       <tbody>${live.map(row).join('')}</tbody></table>`
-    : '<p class="empty">No doctrine yet. A contrarian claim + evidence, or the gate rejects it.</p>';
+    ? `<table class="dt"><thead><tr><th>opinion</th><th>conventional wisdom</th><th>src</th></tr></thead><tbody>${live.map(row).join('')}</tbody></table>`
+    : '<p class="empty">No doctrine yet. A scoped contrarian claim + evidence, or the gate rejects it.</p>';
+  return `<div class="dov">${growth}${table}</div>`;
+}
+
+function renderStandalone() {
   const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>design doctrine</title><style>
 :root{--bg:#fbfbfa;--card:#fff;--ink:#161a19;--mut:#5a6562;--line:#e4e8e6;--acc:#0f6b5c;--warn:#8a6a1a}
 @media(prefers-color-scheme:dark){:root{--bg:#0e1211;--card:#161b1a;--ink:#e9edeb;--mut:#9aa7a3;--line:#243029;--acc:#4ecdb0;--warn:#d3b25f}}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 system-ui,sans-serif;padding:16px}
-.growth{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:0 0 12px;margin:0 0 12px;border-bottom:1px solid var(--line)}
-.strip{display:flex;flex-wrap:wrap;gap:12px;font:12px/1 ui-monospace,SFMono-Regular,Menlo,monospace}
-.ax{color:var(--mut);white-space:nowrap}.ax.on{color:var(--acc)}.ax.mid{color:var(--ink)}
-.count{display:flex;align-items:baseline;gap:6px;white-space:nowrap}.count b{font-size:24px;font-weight:640;line-height:1;letter-spacing:-.02em}.count span{color:var(--mut);font-size:12px}
-.dt{width:100%;border-collapse:collapse;font-size:13px}
-.dt th{text-align:left;font:600 10px/1 ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);padding:0 10px 8px;border-bottom:1px solid var(--line)}
-.dt td{padding:11px 10px;border-bottom:1px solid var(--line);vertical-align:top}
-.dt tr:last-child td{border-bottom:0}
-.dt .cl{color:var(--ink);font-weight:500;width:42%}
-.dt .vs{color:var(--mut);width:32%}
-.dt .ev{font:12px/1.5 ui-monospace,monospace;color:var(--acc);white-space:nowrap}
-.dt .cf{font:600 11px/1 ui-monospace,monospace;text-transform:uppercase;color:var(--mut);white-space:nowrap}
-.dt tr.stale td{background:color-mix(in oklab,var(--warn) 8%,transparent)}.dt tr.stale .cf{color:var(--warn)}
-.empty{color:var(--mut);padding:20px 0}
-</style></head><body>
-${growth}
-${table}
-</body></html>`;
+${DOCTRINE_CSS}
+</style></head><body>${doctrineFragment()}</body></html>`;
   fs.writeFileSync('doctrine.html', html);
   console.log('  rendered → doctrine.html');
 }

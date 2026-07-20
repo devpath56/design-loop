@@ -10,6 +10,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { load, pairSteps, makeShotSrc, esc, AXES, AXIS_HELP, practiceNext } from './lib/runs.mjs';
+import { doctrineFragment, DOCTRINE_CSS } from './doctrine-gate.mjs';
 
 const argv = process.argv.slice(2);
 const urlIdx = argv.indexOf('--url');
@@ -267,7 +268,8 @@ const html = `<!doctype html>
   .ovbar b{font-size:13px;letter-spacing:-.01em}
   .ovbar button{background:none;border:0;color:var(--mut);cursor:pointer;font-size:15px;line-height:1;padding:4px}
   .ovbar button:hover{color:var(--ink)}
-  .ov iframe{border:0;width:100%;flex:1;min-height:320px;background:var(--card)}
+  .ovbody{padding:16px;overflow:auto}
+  ${DOCTRINE_CSS}
   .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
   .bar button:hover,.bar button:focus-visible{border-color:var(--acc);color:var(--ink);outline:none}
   .bar button[aria-pressed=true]{color:var(--acc);border-color:var(--acc)}
@@ -429,7 +431,7 @@ const html = `<!doctype html>
     .grip{display:none}}  /* panel stacks below here; the side-boundary grip would dangle a full-height line through the content */
 </style></head><body>
 <div class="grip" id="grip" title="drag to resize the panel" aria-hidden="true"></div>
-<div class="ov" id="ov" hidden><div class="ovcard"><div class="ovbar"><b>design doctrine</b><button type="button" id="ovx" aria-label="close">✕</button></div><iframe id="ovf" title="design doctrine" src="about:blank"></iframe></div></div>
+<div class="ov" id="ov" hidden><div class="ovcard"><div class="ovbar"><b>design doctrine</b><button type="button" id="ovx" aria-label="close">✕</button></div><div class="ovbody">${(() => { try { return doctrineFragment(); } catch { return '<p style="color:var(--mut);padding:20px">no doctrine yet</p>'; } })()}</div></div></div>
 <div class="stage">
   <div class="bar">
     <label class="ctl"><span class="sr">prototype</span>
@@ -533,11 +535,10 @@ document.getElementById('tg').addEventListener('click',function(e){
 });
 // doctrine overlay: open the log table over the workbench, close on ✕ / backdrop / Esc
 (function(){
-  var ov=document.getElementById('ov'), f=document.getElementById('ovf'), b=document.getElementById('doc'), x=document.getElementById('ovx');
-  if(!ov||!b) return;
-  function open(){ f.src='doctrine.html'; ov.hidden=false; }
-  function close(){ ov.hidden=true; f.src='about:blank'; }
-  b.addEventListener('click',open);
+  var ov=document.getElementById('ov'), b=document.getElementById('doc'), x=document.getElementById('ovx');
+  if(!ov||!b) return;                        // table is inlined, no iframe: works from file://
+  function close(){ ov.hidden=true; }
+  b.addEventListener('click',function(){ ov.hidden=false; });
   x.addEventListener('click',close);
   ov.addEventListener('click',function(e){ if(e.target===ov) close(); });
   document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&!ov.hidden) close(); });
