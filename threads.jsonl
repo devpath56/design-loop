@@ -1,0 +1,20 @@
+{"id": "T-DUR", "ask": "durability + push BOTH repos to GitHub", "kind": "auto", "probe": "cd $HOME/Downloads/design-loop && [ -z \"$(git status --porcelain)\" ] && [ \"$(git rev-parse HEAD)\" = \"$(git rev-parse origin/main)\" ] && cd $HOME/Downloads/Trident-setup && [ -z \"$(git status --porcelain)\" ] && [ \"$(git rev-parse HEAD)\" = \"$(git rev-parse origin/main)\" ]"}
+{"id": "T-MAIN", "ask": "push Trident to main (clean + synced)", "kind": "auto", "probe": "cd $HOME/Downloads/Trident-setup && [ -z \"$(git status --porcelain)\" ] && [ \"$(git rev-parse HEAD)\" = \"$(git rev-parse origin/main)\" ]"}
+{"id": "T-RAT", "ask": "RAT runs at start of every Trident phase, enforced", "kind": "auto", "probe": "grep -q check_rat $HOME/Downloads/Trident-setup/prongs/validate_prongs.py && grep -q PHASE_FROM $HOME/Downloads/Trident-setup/prongs/validate_prongs.py && python3 $HOME/Downloads/Trident-setup/tests/selftest.py >/dev/null 2>&1"}
+{"id": "T-EXP", "ask": "SWE-facing workflow explainer, gated by the loop", "kind": "auto", "probe": "[ -f workflow-explainer.html ] && grep -q workflow-explainer.html design-runs.jsonl"}
+{"id": "T-DOC", "ask": "doctrine store gated, at least one opinion seeded", "kind": "auto", "probe": "node checks/doctrine-gate.mjs --strict >/dev/null 2>&1 && [ \"$(grep -c . doctrine.jsonl)\" -ge 1 ]"}
+{"id": "T-GROW", "ask": "doctrine access + growth from the workbench", "kind": "auto", "probe": "grep -q 'id=\"doc\"' checks/workbench.mjs && grep -q growth checks/doctrine-gate.mjs"}
+{"id": "T-TABLE", "ask": "doctrine as an overlay log table (not a page)", "kind": "auto", "probe": "grep -q 'id=\"ov\"' checks/workbench.mjs && grep -q 'class=\"dt\"' checks/doctrine-gate.mjs && ! grep -q 'id=\"ovf\"' checks/workbench.mjs"}
+{"id": "T-SERVER", "ask": "workbench works with no server (file://)", "kind": "auto", "probe": "grep -q srcdoc checks/workbench.mjs && grep -q protoB64 checks/workbench.mjs"}
+{"id": "T-STAGE", "ask": "prototype stage renders (blank-stage fix)", "kind": "auto", "probe": "grep -q 'id=\"fr\" title' workbench-prototype.html && ! grep -qE 'id=\"fr\"[^>]*src=' workbench-prototype.html"}
+{"id": "T-DROP", "ask": "junk state option ${ok ?} removed from switcher", "kind": "auto", "probe": "! grep -qF '${ok ?' workbench-prototype.html"}
+{"id": "T-C1C3", "ask": "Trident c1c3-audit session closed or resolved", "kind": "auto", "probe": "python3 -c \"import json,sys; r=[json.loads(l) for l in open('$HOME/Downloads/Trident-setup/prongs/prongs.jsonl'.replace('$HOME',__import__('os').path.expanduser('~'))) if l.strip()]; sys.exit(0 if 'c1c3-audit' in {x['runId'] for x in r if x.get('kind')=='close'} else 1)\""}
+{"id": "T-CENSUS", "ask": "Trident census: no transport gaps", "kind": "auto", "probe": "cd $HOME/Downloads/Trident-setup && python3 tests/census.py --strict >/dev/null 2>&1"}
+{"id": "T-COVER", "ask": "design-loop runs fully checked (coverage)", "kind": "auto", "probe": "node checks/verify-render.mjs --target prototype.html >/dev/null 2>&1"}
+{"id": "T-TASKS", "ask": "completed tasks backed by a closed loop", "kind": "auto", "probe": "node checks/validate-tasks.mjs --strict >/dev/null 2>&1"}
+{"id": "T-5", "ask": "draw the missing locked state", "kind": "auto", "probe": "node checks/state-matrix.mjs prototype.html >/dev/null 2>&1"}
+{"id": "T-9", "ask": "loop piece: trigger has no impl/check", "kind": "manual", "status": "open", "note": "design-loop loop piece 1"}
+{"id": "T-10", "ask": "15 of 29 design.md rules have no check", "kind": "manual", "status": "open", "note": "design-loop loop piece 2"}
+{"id": "T-11", "ask": "nothing checks the maker did not self-grade", "kind": "manual", "status": "open", "note": "design-loop loop piece 3"}
+{"id": "T-12", "ask": "check_shape: bullet prefix exempts prose", "kind": "manual", "status": "open", "note": "decide disclose-limit vs tighten"}
+{"id": "T-SWE", "ask": "explainer genuinely lands for an SWE with no context", "kind": "judge", "note": "subjective, read the artifact and rule"}
