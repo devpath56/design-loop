@@ -3,29 +3,37 @@
 <head>
 <meta charset="utf-8">
 <title>slop fixture — a NEGATIVE control for craft-evals</title>
-<!-- This page is deliberately bad. It exists to prove the craft checks DISCRIMINATE: each defect
-     below MUST be caught by a specific craft-evals check. If a check ever passes this page, that
-     check is vacuous (hardcoded PASS / measuring nothing) and craft-controls.mjs goes red. This is
-     the fixture half of Trident's mutation discipline: a gate with no input that must fail is not
-     a gate. Do not "fix" this file — its failures are the test. -->
+<!-- Deliberately bad. Each defect MUST be caught by a specific craft-evals check; a check that
+     passes this page is vacuous and craft-controls.mjs goes red. Do not "fix" this file — its
+     failures ARE the test. -->
 <style>
-  /* linear motion → motion-easing MUST fail (200ms keeps motion-duration in-band on purpose,
-     so only the easing check trips, not the duration one) */
-  .cta { transition: opacity 200ms linear; }
+  body { margin: 40px; color: #000; }
+  /* linear AND 2000ms → motion-easing (linear) and motion-duration (too slow, >400ms) both fail */
+  .cta { transition: opacity 2000ms linear; color: #000; }
+  /* colour-only hover → state-not-colour-alone fails (only `color` changes, nothing structural) */
+  .cta:hover { color: #333; }
+  /* an infinite animation with NO prefers-reduced-motion guard → reduced-motion fails (still moving
+     under reduce) */
+  @keyframes creep { from { transform: translateX(0); } to { transform: translateX(20px); } }
+  .mover { animation: creep 1500ms linear infinite alternate; display: inline-block; }
+  /* NO :focus rule anywhere → focus-authored fails */
 </style>
 </head>
 <body>
-  <!-- EIGHT distinct font sizes → type-scale MUST fail (a held scale is <= 6 steps).
-       ALL weight 400 (nothing bold) → hierarchy-weight MUST fail (one weight = lever unused). -->
+  <!-- EIGHT sizes, some within 1.1x (13 / 13.3) → type-scale (>6) AND hierarchy-size (flat step)
+       fail. ALL weight 400 → hierarchy-weight fails, and with only one lever hierarchy-levers fails.
+       Two near-identical colours (#000 / #0a0a0a) within 1.2x → hierarchy-contrast fails. -->
   <p style="font-size:10px">ten</p>
   <p style="font-size:13px">thirteen</p>
+  <p style="font-size:13.3px;color:#0a0a0a">thirteen point three</p>
   <p style="font-size:17px">seventeen</p>
   <p style="font-size:22px">twenty two</p>
   <p style="font-size:29px">twenty nine</p>
   <p style="font-size:38px">thirty eight</p>
-  <p style="font-size:50px">fifty</p>
-  <!-- spaced em dash in visible copy → copy-no-dash MUST fail -->
-  <p style="font-size:66px">Sign in — welcome back</p>
+  <!-- spaced em dash in visible copy → copy-no-dash fails -->
+  <p style="font-size:50px" class="mover">Sign in — welcome back</p>
   <button class="cta">Continue</button>
+  <!-- a disabled control → keyboard-reach fails (not reachable) -->
+  <button disabled>Unavailable</button>
 </body>
 </html>

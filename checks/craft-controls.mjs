@@ -18,8 +18,17 @@ const HERE = path.dirname(new URL(import.meta.url).pathname);
 const CE = path.join(HERE, 'craft-evals.mjs');
 const fixture = (name) => path.join(HERE, '..', 'fixtures', name);
 
-// The checks these fixtures deterministically pin. Each MUST fail on slop and pass on clean.
-const PINNED = ['type-scale', 'hierarchy-weight', 'copy-no-dash', 'motion-easing'];
+// The checks these fixtures deterministically pin: each MUST fail on slop and pass on clean. 14 of
+// craft-evals' 17. The other 3 are honest blind spots (named, not hidden — the point of Trident's
+// HUMAN_ONLY list): `hierarchy-contrast` resists a stable two-fixture pin (luminance separation is
+// sensitive to rendering), and `feedback-latency` + `destructive-reversible` are advisory INFO/WARN
+// with no deterministic FAIL to assert.
+const PINNED = [
+  'focus-visible', 'focus-authored', 'keyboard-reach', 'type-scale', 'hierarchy-size',
+  'hierarchy-weight', 'hierarchy-spacing', 'hierarchy-levers', 'copy-no-dash', 'motion-duration',
+  'motion-easing', 'reduced-motion', 'hover-affordance', 'state-not-colour-alone',
+];
+const NOT_PINNED = ['hierarchy-contrast (fixture-sensitive)', 'feedback-latency (advisory INFO)', 'destructive-reversible (advisory WARN)'];
 
 function verdicts(file) {
   const r = spawnSync('node', [CE, file, '--json'], { encoding: 'utf8', maxBuffer: 1 << 24, timeout: 120_000 });
@@ -53,5 +62,7 @@ if (slop && clean) {
   for (const id of PINNED) check(`${id} is a real craft-evals check id (not a typo)`, id in slop);
 }
 
+console.log(`\n  ${PINNED.length}/17 craft checks pinned between slop and clean. Not pinned (named, not hidden):`);
+NOT_PINNED.forEach((n) => console.log(`    · ${n}`));
 console.log(`\nRESULT: ${fails ? `${fails} FAIL` : 'PASS'}`);
 process.exit(fails ? 1 : 0);
