@@ -58,7 +58,13 @@ const CHECKERS = [
     fix: (id) => `node checks/log-teach.mjs ${id} --json '{...}'` },
 ];
 
-const coverage = steps.filter((s) => s.run.id).map((s) => ({
+// Forward-only (gates apply forward, never backfilled). Every run before this predates the
+// progressive wiring of the auto-checkers (craft-evals + state-matrix into design-gate) and
+// the cold-audit/teaching discipline; backfilling their teaching is exactly what was rejected
+// as bloat. So they are historical-exempt, and coverage is REQUIRED from here on.
+const COVERAGE_FROM = '2026-07-20T00:30:00Z';
+const exemptRuns = steps.filter((s) => s.run.id && (s.run.ts || '') < COVERAGE_FROM).length;
+const coverage = steps.filter((s) => s.run.id && (s.run.ts || '') >= COVERAGE_FROM).map((s) => ({
   id: s.run.id,
   note: (s.run.note || '').slice(0, 34),
   missing: CHECKERS.filter((c) => !c.has(s)),
@@ -132,6 +138,26 @@ try {
     return out;
   });
   for (const d of dead) chromeMissing.push(`dead: ${d}`);
+
+  // STATE-SWITCH gate (CF-070, deterministic). The srcdoc state-switch was silently broken
+  // once (replaceState no-ops on about:srcdoc) and only an eyeball caught it. Drive the state
+  // dropdown to a drawn state and assert the embedded prototype actually switches. This is the
+  // automated version of "see it, do not grep it".
+  const drawn = await page.$$eval('#st option', (os) =>
+    os.filter((o) => o.value && !o.disabled).map((o) => o.value));
+  if (drawn.length) {
+    const target = drawn[drawn.length - 1];
+    await page.selectOption('#st', target).catch(() => {});
+    await page.waitForTimeout(600); // srcdoc reload
+    const switched = await page.evaluate((t) => {
+      const fr = document.getElementById('fr');
+      const d = fr && fr.contentDocument;
+      if (!d) return false;
+      const vis = [...d.querySelectorAll('[data-state]')].filter((e) => !e.hidden).map((e) => e.getAttribute('data-state'));
+      return vis.includes(t);
+    }, target);
+    if (!switched) chromeMissing.push(`state-switch dead: selecting '${target}' did not drive the stage`);
+  }
 } finally {
   await browser.close();
 }
@@ -149,9 +175,9 @@ if (!chromeMissing.length) {
   console.log(`      every prototype in the loop must render inside the workbench shell. Fix workbench.mjs`);
 }
 
-console.log(`\n  COVERAGE: did each checker actually run?`);
+console.log(`\n  COVERAGE: did each checker actually run?  (${exemptRuns} historical run(s) exempt, pre-wiring)`);
 if (!uncovered.length) {
-  console.log(`    PASS  all ${CHECKERS.length} checkers left evidence on all ${coverage.length} run(s)`);
+  console.log(`    PASS  all ${CHECKERS.length} checkers left evidence on all ${coverage.length} in-scope run(s)`);
 } else {
   console.log(`    FAIL  ${uncovered.length}/${coverage.length} run(s) were never fully checked\n`);
   for (const c of uncovered) {

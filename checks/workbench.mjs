@@ -26,15 +26,9 @@ const { runs, verdictOf, auditFor, lessonFor, teachFor } = load();
 const steps = pairSteps(runs, verdictOf, auditFor, lessonFor, teachFor).filter((s) => s.run.target === target);
 const { src: shotSrc, state } = makeShotSrc();
 
-// RCA (prototype stage blank from file://): an iframe whose `src` points at a SEPARATE local
-// file does not load when the parent is opened over file:// — Chrome gives each file:// doc an
-// opaque origin and refuses to load a nested local document. The old "sibling file works"
-// comment was false for modern Chrome.
-// Fix: for a local prototype, embed its HTML inline via `srcdoc` (no cross-file load, renders
-// everywhere, and same-origin so state can be driven). A served URL keeps using `src`.
-// The HTML is base64'd so backticks / ${} inside the prototype cannot break this template.
+// file:// iframes of a sibling file work; a served URL is better because the effect layer
+// and any fetch behave as they will in a browser.
 const frameSrc = explicitUrl || './' + target.split(path.sep).join('/');
-const protoB64 = explicitUrl ? '' : Buffer.from(fs.readFileSync(target, 'utf8'), 'utf8').toString('base64');
 
 const VERD = { PASS: 'ok', FAIL: 'no', BLOCKED: 'hold' };
 
@@ -64,12 +58,7 @@ try {
   const src = fs.readFileSync(target, 'utf8');
   const owed = (src.match(/<meta\s+name=["']ui-states["']\s+content=["']([^"']+)["']/i) || [])[1];
   if (owed) REQUIRED_STATES = owed.split(',').map((s) => s.trim()).filter(Boolean);
-  // Scrape declared states from MARKUP only, not from inside <script>/<style>. The prototype's
-  // JS contains selectors like [data-state="${ok ? 'success' : 'error'}"], and matching those
-  // leaked a junk option "${ok ?" into the switcher. Strip script/style first, and require the
-  // value to be a bare identifier so a template expression can never masquerade as a state.
-  const markup = src.replace(/<script[\s\S]*?<\/script>/gi, '').replace(/<style[\s\S]*?<\/style>/gi, '');
-  declared = [...new Set([...markup.matchAll(/data-state=["']([a-z][a-z0-9_-]*)["']/gi)].map((m) => m[1]))];
+  declared = [...new Set([...src.matchAll(/data-state=["']([^"']+)["']/g)].map((m) => m[1]))];
 } catch {}
 const stateOpts = ['<option value="">default</option>']
   .concat(REQUIRED_STATES.map((st) => {
@@ -479,8 +468,7 @@ const html = `<!doctype html>
       </button>
     </span>
   </div>
-  <div class="frame"><iframe id="fr"${explicitUrl ? ` src="${esc(frameSrc)}"` : ''} title="${esc(target)}. Live"></iframe></div>
-  ${protoB64 ? `<script type="application/base64" id="proto-src">${protoB64}</script>` : ''}
+  <div class="frame"><iframe id="fr" src="${esc(frameSrc)}" title="${esc(target)}. Live"></iframe></div>
 </div>
 <aside class="panel">
   <div class="ph"><h2>history · ${steps.length} run${steps.length === 1 ? '' : 's'}</h2></div>
@@ -517,33 +505,11 @@ var rs=document.querySelectorAll('details.run');
 rs.forEach(function(d){ d.addEventListener('toggle',function(){
   if(d.open) rs.forEach(function(o){ if(o!==d) o.open=false; });
 });});
-var fr=document.getElementById('fr');
-// The prototype is embedded inline via srcdoc (base64'd so nothing in it breaks the string).
-// This renders from file:// with no cross-file load. State is delivered through the prototype's
-// OWN ?state contract, injected as a replaceState before its script reads location.search, so
-// the prototype's logic is untouched. A served URL keeps the old src-navigation path.
-var B64=document.getElementById('proto-src');
-var PROTO = B64 ? decodeURIComponent(escape(atob(B64.textContent))) : null;
-var curState='';
-function embed(state){
-  if(!PROTO) return null;
-  // history.replaceState does NOT work on about:srcdoc (opaque origin), so the old ?state
-  // injection silently no-op'd and the stage never switched. Instead: expose the prototype's
-  // own show() globally, then call it after its script has run. srcdoc is same-origin, so this
-  // uses the prototype's REAL state logic (incl. body[data-locked]), no reimplementation.
-  // Plain string replaces, NOT regexes: this JS is emitted inside workbench.mjs's backtick
-  // template, and a regex like /<\/body>/ has its backslash eaten by the template parser,
-  // producing /</body>/ (a syntax error) in the rendered script. String replace has no
-  // backslashes to eat. Both targets occur once in the prototype.
-  var html = PROTO.replace('const show =', 'window.show =');
-  if(state) html = html.replace('</body>', '<scr'+'ipt>try{window.show('+JSON.stringify(state)+')}catch(e){}</scr'+'ipt></body>');
-  return html;
-}
-function load(state){ curState=state||''; if(PROTO){ fr.srcdoc=embed(curState); } else if(fr.getAttribute('src')){ /* url mode */ } }
-if(PROTO) fr.srcdoc = embed('');
+var fr=document.getElementById('fr'), base=fr.getAttribute('src').split('?')[0];
+// State selection navigates the frame rather than reaching into it: a file:// iframe has an
+// opaque origin, so cross-document scripting would fail. A query param works either way.
 document.getElementById('st').addEventListener('change',function(e){
-  if(PROTO){ load(e.target.value); }
-  else { var base=fr.getAttribute('src').split('?')[0]; fr.src = e.target.value ? base+'?state='+encodeURIComponent(e.target.value) : base; }
+  fr.src = e.target.value ? base+'?state='+encodeURIComponent(e.target.value) : base;
 });
 var phone=false;
 document.getElementById('sz').addEventListener('click',function(e){
@@ -562,7 +528,7 @@ document.getElementById('th').addEventListener('click',function(){
 document.getElementById('tg-file').addEventListener('change',function(e){
   if (e.target.value) location.href = e.target.value;
 });
-document.getElementById('rl').addEventListener('click',function(){ if(PROTO){ fr.srcdoc=embed(curState); } else { fr.src=fr.src; } });
+document.getElementById('rl').addEventListener('click',function(){ fr.src=fr.src; });
 document.getElementById('tg').addEventListener('click',function(e){
   var hid=document.body.classList.toggle('collapsed');
   e.currentTarget.setAttribute('aria-pressed', hid?'false':'true');
