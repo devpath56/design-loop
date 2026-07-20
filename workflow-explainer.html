@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CI for design taste</title>
+<style>
+  :root{
+    --bg:#fbfbfa; --card:#ffffff; --sunk:#f4f5f3;
+    --ink:#161a19; --mut:#5a6562; --faint:#63706c; --line:#e4e8e6;
+    --acc:#0f6b5c; --acc-soft:#e3f0ec;
+    --pass:#1f6b4a; --fail:#a8321f; --hold:#8a6a1a;
+    --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --bg:#0e1211; --card:#161b1a; --sunk:#101514;
+      --ink:#e9edeb; --mut:#9aa7a3; --faint:#828f8a; --line:#243029;
+      --acc:#4ecdb0; --acc-soft:#152622;
+      --pass:#57c79a; --fail:#e58a76; --hold:#d3b25f;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0e1211; --card:#161b1a; --sunk:#101514;
+    --ink:#e9edeb; --mut:#9aa7a3; --faint:#828f8a; --line:#243029;
+    --acc:#4ecdb0; --acc-soft:#152622;
+    --pass:#57c79a; --fail:#e58a76; --hold:#d3b25f;
+  }
+  :root[data-theme="light"]{
+    --bg:#fbfbfa; --card:#ffffff; --sunk:#f4f5f3;
+    --ink:#161a19; --mut:#5a6562; --faint:#63706c; --line:#e4e8e6;
+    --acc:#0f6b5c; --acc-soft:#e3f0ec;
+    --pass:#1f6b4a; --fail:#a8321f; --hold:#8a6a1a;
+  }
+
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font:400 17px/1.62 var(--sans);
+    -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+  }
+  .wrap{max-width:920px; margin:0 auto; padding:0 24px}
+  section{padding:64px 0; border-top:1px solid var(--line)}
+  section:first-of-type{border-top:0}
+
+  a{color:var(--acc); text-decoration:none; border-bottom:1px solid color-mix(in oklab,var(--acc) 35%,transparent)}
+  a:hover{border-bottom-color:var(--acc)}
+  a:focus-visible,summary:focus-visible{outline:2px solid var(--acc); outline-offset:3px; border-radius:3px}
+
+  .eyebrow{
+    font:600 12px/1 var(--mono); letter-spacing:.14em; text-transform:uppercase;
+    color:var(--acc); margin:0 0 20px;
+  }
+  h1{
+    font-size:clamp(2.3rem,6.2vw,3.6rem); line-height:1.02; letter-spacing:-.02em;
+    font-weight:640; margin:0 0 22px; text-wrap:balance;
+  }
+  h2{font-size:1.5rem; line-height:1.15; letter-spacing:-.01em; font-weight:620; margin:0 0 6px; text-wrap:balance}
+  h3{font-size:1.06rem; font-weight:620; margin:0 0 4px; letter-spacing:-.005em}
+  p{margin:0 0 16px; max-width:66ch}
+  .lead{font-size:1.22rem; line-height:1.55; color:var(--ink); max-width:60ch}
+  .sub{color:var(--mut); max-width:62ch}
+  .kicker{font:600 12px/1 var(--mono); letter-spacing:.1em; text-transform:uppercase; color:var(--faint); margin:0 0 14px}
+  strong{font-weight:640}
+  code,.m{font-family:var(--mono); font-size:.9em}
+
+  /* hero */
+  .hero{padding-top:76px}
+  .hero .lead{margin-bottom:26px}
+  .badge{
+    display:inline-flex; align-items:center; gap:10px; margin-bottom:34px;
+    font:600 13px/1 var(--mono); letter-spacing:.02em;
+    background:var(--card); border:1px solid var(--line); border-radius:999px;
+    padding:9px 15px 9px 12px;
+  }
+  .dot{width:9px; height:9px; border-radius:50%; background:var(--pass); box-shadow:0 0 0 4px color-mix(in oklab,var(--pass) 20%,transparent)}
+  .badge .ok{color:var(--pass)}
+  .badge .sep{color:var(--faint)}
+  .who{
+    margin-top:30px; font:500 13.5px/1.5 var(--mono); color:var(--mut);
+    display:flex; gap:9px; align-items:baseline;
+  }
+  .who b{color:var(--acc); font-weight:600}
+
+  /* pipeline */
+  .rail{display:grid; grid-template-columns:repeat(5,1fr); gap:0; margin-top:34px; border:1px solid var(--line); border-radius:14px; overflow:hidden; background:var(--card)}
+  .stn{padding:20px 18px; border-right:1px solid var(--line); position:relative}
+  .stn:last-child{border-right:0}
+  .stn .n{font:600 11px/1 var(--mono); color:var(--acc); letter-spacing:.1em}
+  .stn h4{margin:12px 0 6px; font-size:1rem; font-weight:620; letter-spacing:-.01em}
+  .stn p{font-size:13.5px; line-height:1.45; color:var(--mut); margin:0; max-width:none}
+  @media (max-width:760px){
+    .rail{grid-template-columns:1fr}
+    .stn{border-right:0; border-bottom:1px solid var(--line)}
+    .stn:last-child{border-bottom:0}
+  }
+
+  /* frictions */
+  .cards{display:flex; flex-direction:column; gap:14px; margin-top:34px}
+  details.card{
+    background:var(--card); border:1px solid var(--line); border-radius:14px;
+    overflow:hidden; transition:border-color .16s ease;
+  }
+  details.card[open]{border-color:color-mix(in oklab,var(--acc) 30%,var(--line))}
+  details.card:hover{border-color:color-mix(in oklab,var(--acc) 22%,var(--line))}
+  summary{list-style:none; cursor:pointer; padding:22px 22px; display:grid; grid-template-columns:1fr auto; gap:6px 16px; align-items:baseline}
+  summary::-webkit-details-marker{display:none}
+  .friction{grid-column:1; font-size:1.12rem; font-weight:600; letter-spacing:-.01em}
+  .friction .q{color:var(--faint); font-family:var(--mono); font-weight:600; margin-right:8px}
+  .toll{grid-column:2; grid-row:1/span 2; align-self:center; font:600 11px/1 var(--mono); letter-spacing:.08em; text-transform:uppercase; color:var(--mut); white-space:nowrap; display:flex; align-items:center; gap:8px}
+  .chev{width:18px; height:18px; color:var(--faint); transition:transform .18s ease; flex:none}
+  details[open] .chev{transform:rotate(90deg)}
+  .mech{grid-column:1; color:var(--mut); font-size:15px; line-height:1.5}
+  .mech b{color:var(--ink)}
+  .body{padding:0 22px 24px; border-top:1px solid var(--line); margin-top:2px}
+  .body .row{display:grid; grid-template-columns:130px 1fr; gap:6px 20px; padding:16px 0; border-bottom:1px solid var(--line)}
+  .body .row:last-child{border-bottom:0}
+  .body .row dt{font:600 11px/1.5 var(--mono); letter-spacing:.08em; text-transform:uppercase; color:var(--faint)}
+  .body .row dd{margin:0; color:var(--ink); font-size:15px; line-height:1.55}
+  .body .row dd .parallel{color:var(--mut)}
+  @media (max-width:620px){
+    summary{grid-template-columns:1fr; padding:18px}
+    .toll{grid-column:1; grid-row:auto; justify-content:flex-start; margin-top:2px}
+    .body .row{grid-template-columns:1fr; gap:3px}
+  }
+
+  /* receipt (machine voice) */
+  .receipt{
+    font-family:var(--mono); font-size:13px; line-height:1.7; color:var(--ink);
+    background:var(--sunk); border:1px solid var(--line); border-radius:10px;
+    padding:14px 16px; margin-top:10px; overflow-x:auto;
+  }
+  .receipt .ok{color:var(--pass)} .receipt .bad{color:var(--fail)} .receipt .dim{color:var(--faint)}
+
+  /* anatomy table */
+  .tbl{width:100%; border-collapse:collapse; margin-top:26px; font-size:15px}
+  .tbl th,.tbl td{text-align:left; padding:13px 14px; border-bottom:1px solid var(--line); vertical-align:top}
+  .tbl th{font:600 11px/1 var(--mono); letter-spacing:.09em; text-transform:uppercase; color:var(--faint)}
+  .tbl td.k{font-family:var(--mono); font-size:13px; color:var(--acc); white-space:nowrap}
+  .tbl td.d{color:var(--mut)}
+  .tbl tr:last-child td{border-bottom:0}
+  .scroll{overflow-x:auto}
+
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:26px}
+  @media (max-width:620px){.grid2{grid-template-columns:1fr}}
+  .note{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:20px}
+  .note h3{margin-bottom:8px}
+  .note p{font-size:14.5px; color:var(--mut); margin:0}
+
+  .limits li{margin:0 0 12px; color:var(--mut); max-width:64ch}
+  .limits li b{color:var(--ink); font-weight:600}
+  .limits ul{padding-left:0; list-style:none; margin:22px 0 0}
+  .limits li::before{content:"—"; color:var(--acc); font-family:var(--mono); margin-right:12px}
+
+  footer{padding:40px 0 72px; color:var(--faint); font-size:13.5px}
+  footer .built{font-family:var(--mono); font-size:12.5px; letter-spacing:.02em; color:var(--mut); margin-bottom:10px}
+
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <section class="hero">
+    <p class="eyebrow">A quality harness for design</p>
+    <h1>CI for design taste.</h1>
+    <div class="badge"><span class="dot" aria-hidden="true"></span><span class="ok">gate: PASS</span><span class="sep">·</span><span>0 critical</span><span class="sep">·</span><span>2 checkers agreed</span></div>
+    <p class="lead">An AI writes the UI. A pipeline of gates decides whether it ships.</p>
+    <p class="sub">It is the discipline you already trust for code, pointed at how a screen looks and reads: a linter, a test suite, a reviewer who did not write the change, and coverage that proves the checks actually ran. Nothing here rests on someone saying it looks fine.</p>
+    <p class="who"><b>&gt;</b> Written for engineers. No design background needed.</p>
+  </section>
+
+  <section>
+    <p class="kicker">The loop, in five moves</p>
+    <h2>One change in, a graded change out.</h2>
+    <p class="sub">You trigger a run on one prototype. The change flows through five stations, left to right. A run that fails is kept, not hidden: the failing row is the most useful one in the table.</p>
+    <div class="rail">
+      <div class="stn"><div class="n">01 · MAKE</div><h4>Generate</h4><p>A model makes one focused change, steered off the generic defaults that AI design collapses toward.</p></div>
+      <div class="stn"><div class="n">02 · CHECK</div><h4>Two checkers</h4><p>A deterministic pass (contrast, focus, overflow) and a second model that reviews the file cold.</p></div>
+      <div class="stn"><div class="n">03 · GATE</div><h4>Binary</h4><p>Ships only if the deterministic pass is clean and the reviewer logs nothing critical. Three tries, then stop.</p></div>
+      <div class="stn"><div class="n">04 · LEARN</div><h4>Record</h4><p>Every run writes one reusable lesson. A spaced quiz resurfaces it later so it sticks.</p></div>
+      <div class="stn"><div class="n">05 · PUBLISH</div><h4>Show</h4><p>Six views regenerate: the decision table, the side-by-side history, loop health, and a coverage check.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <p class="kicker">Why it exists</p>
+    <h2>Every part was built to kill a specific recurring failure.</h2>
+    <p class="sub">Not features chosen up front. Each mechanism traces to a friction that kept recurring, logged as a numbered failure the way you would file a flaky-test bug. Open one to see the receipt.</p>
+
+    <div class="cards">
+
+      <details class="card">
+        <summary>
+          <span class="friction"><span class="q">01</span>All AI design looks the same.</span>
+          <span class="toll">the maker<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span>
+          <span class="mech"><b>Fix: an off-distribution generator plus 57 named "slop" gates.</b> Slop is the house look a model falls into by default, the same gradient hero and centered everything. Each tell is a named rule the reviewer checks for, so "this looks machine-made" becomes a lint failure with a line number.</span>
+        </summary>
+        <div class="body">
+          <div class="row"><dt>plain terms</dt><dd>Like a linter, except the rules are for visual clichés instead of unused variables.</dd></div>
+          <div class="row"><dt>the tell</dt><dd>Structural devices (numbering, dividers, eyebrows) must <span class="parallel">encode something true, not decorate</span>. A divider that separates nothing is flagged.</dd></div>
+          <div class="row"><dt>receipt</dt><dd><div class="receipt" tabindex="0" role="group" aria-label="example output"><span class="dim">$ hallmark audit page.html</span><br>[ { "gate":"decorative-structure", "severity":"major",<br>&nbsp;&nbsp;"where":"hero:41", "fix":"the accent bar encodes nothing, cut it" } ]</div></dd></div>
+        </div>
+      </details>
+
+      <details class="card">
+        <summary>
+          <span class="friction"><span class="q">02</span>The author is the worst reviewer of their own work.</span>
+          <span class="toll">cold review<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span>
+          <span class="mech"><b>Fix: the reviewer is a second model that never saw the reasoning.</b> Run inline, a review grades the argument it just made and waves it through. A fresh reviewer sees only the file, so it catches what the author is blind to.</span>
+        </summary>
+        <div class="body">
+          <div class="row"><dt>plain terms</dt><dd>Code review by someone who did not write the change. Two independent judges fail in different ways; that is the point.</dd></div>
+          <div class="row"><dt>the guard</dt><dd>The reviewer runs in a separate process and is handed the file and nothing else. No diff, no rationale, no history.</dd></div>
+          <div class="row"><dt>proof it works</dt><dd>On a later audit, the cold reviewer found a required field that accepted whitespace, and a bug the author had read past three times.</dd></div>
+        </div>
+      </details>
+
+      <details class="card">
+        <summary>
+          <span class="friction"><span class="q">03</span>The build was green, but half the checks never ran.</span>
+          <span class="toll">coverage<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span>
+          <span class="mech"><b>Fix: a coverage step that asks "did each checker actually execute", not just "did it pass".</b> Six runs in a row showed a green gate while the craft checks had never run once. A missing result looked exactly like a clean one.</span>
+        </summary>
+        <div class="body">
+          <div class="row"><dt>plain terms</dt><dd>CI passing because the test suite was silently skipped. Absence of a finding is not a finding of absence.</dd></div>
+          <div class="row"><dt>filed as</dt><dd>Bug <span class="m">CF-065</span>, "absence takes the shape of the nearest acceptable outcome." Six distinct instances in one session.</dd></div>
+          <div class="row"><dt>the rule</dt><dd>A check must distinguish three outcomes, never two: it <span class="parallel">held / it failed / it never ran</span>. A binary check folds the third into the first.</dd></div>
+        </div>
+      </details>
+
+      <details class="card">
+        <summary>
+          <span class="friction"><span class="q">04</span>A test that can never fail is not a test.</span>
+          <span class="toll">mutation<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span>
+          <span class="mech"><b>Fix: every check ships a control that must fire, and the checker itself gets broken on purpose to confirm the test screams.</b> A control wired to real logic and one hardcoded to pass look identical on the page. They diverge only when the code breaks, the one moment the check exists for.</span>
+        </summary>
+        <div class="body">
+          <div class="row"><dt>plain terms</dt><dd>Mutation testing. You damage the code and demand the suite go red. If it stays green, the test was theater.</dd></div>
+          <div class="row"><dt>filed as</dt><dd>Bug <span class="m">CF-067</span>. Negative controls were assumed live because they existed. Reading cannot tell a wired control from a fake one.</dd></div>
+          <div class="row"><dt>receipt</dt><dd><div class="receipt" tabindex="0" role="group" aria-label="example output"><span class="dim"># delete a checker's body, re-run</span><br><span class="ok">ok</span>&nbsp;&nbsp;killed by 5 controls<br><span class="bad">SURVIVED</span>&nbsp;nothing noticed &rarr; a hole in the suite</div></dd></div>
+        </div>
+      </details>
+
+      <details class="card">
+        <summary>
+          <span class="friction"><span class="q">05</span>Rules written in a doc get ignored.</span>
+          <span class="toll">enforcement<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span>
+          <span class="mech"><b>Fix: a rule is real only once a script enforces it.</b> A style guide nobody runs decays to zero. So the house style is executable: contrast thresholds, motion timing, and hierarchy ratios are code that fails the build, not prose in a wiki.</span>
+        </summary>
+        <div class="body">
+          <div class="row"><dt>plain terms</dt><dd>A lint rule, versus a paragraph in CONTRIBUTING.md that everyone stopped reading in week two.</dd></div>
+          <div class="row"><dt>the test</dt><dd>Revert any change and ask whether a gate goes red. If it stays green, the change was a suggestion, not a guarantee. There is a one-command tool that proves this.</dd></div>
+          <div class="row"><dt>the boundary</dt><dd>The gate checks the artifact, never the intent. It can prove the field is filled; it cannot prove the answer is honest. That limit is stated, not hidden.</dd></div>
+        </div>
+      </details>
+
+      <details class="card">
+        <summary>
+          <span class="friction"><span class="q">06</span>"Looks off" is not something you can act on.</span>
+          <span class="toll">measurement<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span>
+          <span class="mech"><b>Fix: turn the vague complaint into a number with a threshold.</b> Visual hierarchy gets measured on four levers as ratios, and tap targets are checked against three published standards, each cited with its limits. A code smell becomes a metric.</span>
+        </summary>
+        <div class="body">
+          <div class="row"><dt>plain terms</dt><dd>Like a cyclomatic-complexity gate: it replaces "this feels heavy" with "> 1.1x or it fails".</dd></div>
+          <div class="row"><dt>hierarchy</dt><dd>size, weight, contrast, spacing. Measured as the <span class="parallel">difference between levels</span>, never the raw values. 12/13/14px is three numbers and one rank.</dd></div>
+          <div class="row"><dt>receipt</dt><dd><div class="receipt" tabindex="0" role="group" aria-label="example output">size steps&nbsp;&nbsp;<span class="dim">12 / 14 / 20px &rarr;</span> <span class="ok">1.17x · 1.43x</span> ok<br>levers&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="ok">4/4 in play</span> (size · weight · contrast · spacing)</div></dd></div>
+        </div>
+      </details>
+
+    </div>
+  </section>
+
+  <section>
+    <p class="kicker">Anatomy</p>
+    <h2>Six parts, each replaceable.</h2>
+    <p class="sub">The loop is built from named pieces, the same way a CI system is a trigger plus stages plus a config file. Each is a script you can read, swap, or delete, and the coverage step will tell you if you deleted one that mattered.</p>
+    <div class="scroll" tabindex="0" role="group" aria-label="table, scrolls horizontally">
+      <table class="tbl">
+        <thead><tr><th>piece</th><th>what it is</th><th>the code analogue</th></tr></thead>
+        <tbody>
+          <tr><td class="k">trigger</td><td>You, running one command on one prototype.</td><td class="d">git push</td></tr>
+          <tr><td class="k">skill file</td><td>The house style: contrast floors, motion timing, hierarchy ratios.</td><td class="d">.eslintrc</td></tr>
+          <tr><td class="k">maker</td><td>The model that makes one off-distribution change.</td><td class="d">the codegen step</td></tr>
+          <tr><td class="k">checkers</td><td>Deterministic a11y pass + a cold structural reviewer.</td><td class="d">unit tests + code review</td></tr>
+          <tr><td class="k">gate</td><td>Binary verdict with teeth. Clean + no critical, or it stops.</td><td class="d">required status check</td></tr>
+          <tr><td class="k">state</td><td>A ledger of runs and lessons, resurfaced on a spaced schedule.</td><td class="d">CHANGELOG + postmortems</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="grid2">
+      <div class="note"><h3>The receipts are the product</h3><p>Nine graded runs, twelve reusable lessons, a catalog of 66 named failure modes. The value is not any single screen; it is the trail that makes the next screen faster and the checkers themselves harder to fool.</p></div>
+      <div class="note"><h3>Two judges, decorrelated</h3><p>The deterministic checker catches what code can measure exactly (a contrast ratio is not a matter of opinion). The cold model catches what needs judgment. Neither grades its own work, so their blind spots do not overlap.</p></div>
+    </div>
+  </section>
+
+  <section class="limits">
+    <p class="kicker">Where it stops, honestly</p>
+    <h2>What a gate cannot do.</h2>
+    <ul>
+      <li><b>It checks the artifact, not the intent.</b> A gate can prove a field is filled and a contrast ratio clears. It cannot prove the design solves the right problem. That call stays human.</li>
+      <li><b>Coverage is relative to the checks that exist.</b> A file no checker looks at reads as clean because nothing measured it. Green means the checks that ran, passed, and nothing more.</li>
+      <li><b>Automated taste can be confidently wrong.</b> A fast, valid signal is what turns practice into skill; a fast, invalid one just trains you to trust bad calls faster. So every judgment is sourced or labeled opinion.</li>
+    </ul>
+  </section>
+
+  <footer>
+    <p class="built">built on · axe-core · a headless browser · a second model reviewing cold · plain .jsonl ledgers</p>
+    <p>A self-improving design review loop. Open source at <a href="https://github.com/devpath56/design-loop">github.com/devpath56/design-loop</a>.</p>
+  </footer>
+
+</div>
+
+</body>
+</html>

@@ -560,16 +560,25 @@ if (siblings.length > 1) console.log(`  ${siblings.length} prototypes discoverab
 // silently reverting on its very first run.
 {
   const vr = path.join(path.dirname(new URL(import.meta.url).pathname), 'verify-render.mjs');
-  const r = spawnSync(process.execPath, [vr], { encoding: 'utf8', timeout: 60_000 });
+  // Verify THIS target's workbench (not the default prototype), and propagate the exit code:
+  // a render that drops the nav bar or control panel must fail the render, not merely print a
+  // warning. That is what makes the shell durable, and what lets prove-durable catch a revert
+  // of this file by re-rendering.
+  const r = spawnSync(process.execPath, [vr, '--target', target], { encoding: 'utf8', timeout: 60_000 });
   const out = (r.stdout ?? '') + (r.stderr ?? '');
   if (r.status === null) {
     console.log(`\n  verify-render did not finish in 60s. The render is UNVERIFIED.`);
+    process.exitCode = 1;
   } else {
-    // Echo only the verdict lines. The full report is one command away and printing it here
-    // would bury the render output it is commenting on.
     for (const l of out.split('\n')) {
-      if (/^\s{2,4}(PASS|FAIL)\s/.test(l) || /^\s+(COVERAGE|FORMAT):/.test(l)) console.log(`  ${l.trim()}`);
+      if (/^\s{2,4}(PASS|FAIL)\s/.test(l) || /^\s+(CHROME|COVERAGE|FORMAT|TASKS):/.test(l)) console.log(`  ${l.trim()}`);
     }
-    if (r.status !== 0) console.log(`  ^ node checks/verify-render.mjs for the detail`);
+    // Fail the render ONLY on a missing shell (CHROME): the nav bar and control panel are what
+    // every render must guarantee. COVERAGE gaps and untaught gap cards are a backlog, not a
+    // broken render, so they report without failing.
+    if (/CHROME:[\s\S]*?FAIL\s+\d+ missing/.test(out)) {
+      console.log(`  ^ render dropped part of the workbench shell. node checks/verify-render.mjs --target ${target}`);
+      process.exitCode = 1;
+    }
   }
 }

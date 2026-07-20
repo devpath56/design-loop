@@ -66,9 +66,25 @@ const coverage = steps.filter((s) => s.run.id).map((s) => ({
 
 const browser = await chromium.launch();
 const problems = [];
+const chromeMissing = [];
 try {
   const page = await (await browser.newContext({ viewport: { width: 1280, height: 900 } })).newPage();
   await page.goto(`file://${path.resolve(wb)}`, { waitUntil: 'networkidle' });
+
+  // ── CHROME. Every prototype iterated in the loop must render inside the workbench shell:
+  // the nav bar (name switch, state dropdown, width toggle, theme toggle, panel toggle) and
+  // the control panel. Asserted here so a change to workbench.mjs that drops any of them fails
+  // the render, not just looks wrong. These are queried in the REAL rendered file, so the
+  // check tracks what shipped, not what the source intends.
+  const CHROME = [
+    { key: 'nav: prototype switch', sel: 'select#tg-file' },
+    { key: 'nav: state dropdown', sel: 'select#st' },
+    { key: 'nav: width toggle', sel: '[aria-label="toggle phone or desktop width"]' },
+    { key: 'nav: theme toggle', sel: '[aria-label="toggle light or dark theme"]' },
+    { key: 'nav: panel toggle', sel: '[aria-label="toggle panel"]' },
+    { key: 'control panel', sel: 'aside.panel' },
+  ];
+  for (const c of CHROME) if (!(await page.$(c.sel))) chromeMissing.push(c.key);
 
   const cards = await page.$$('details.run');
   for (const [i, card] of cards.entries()) {
@@ -104,6 +120,18 @@ try {
     }
     if (missing.length) problems.push({ card: title, missing });
   }
+  // Behaviour, not just presence: a control that renders but does nothing passes a presence
+  // check vacuously. Click the two toggles with a clean signal and confirm each changes state.
+  // Cheap: same page, two clicks, run last so it does not disturb the card checks above.
+  const dead = await page.evaluate(() => {
+    const out = [], root = document.documentElement;
+    const th = document.getElementById('th');
+    if (th) { const b = root.getAttribute('data-theme'); th.click(); if (root.getAttribute('data-theme') === b) out.push('theme toggle'); }
+    const tg = document.getElementById('tg');
+    if (tg) { const b = document.body.classList.contains('collapsed'); tg.click(); if (document.body.classList.contains('collapsed') === b) out.push('panel toggle'); }
+    return out;
+  });
+  for (const d of dead) chromeMissing.push(`dead: ${d}`);
 } finally {
   await browser.close();
 }
@@ -112,6 +140,15 @@ const checked = steps.filter((s) => s.run.id).length;
 // coverage first: a card cannot follow the format if the inputs never ran
 const uncovered = coverage.filter((c) => c.missing.length);
 console.log(`\n  verify · ${wb}`);
+
+console.log(`\n  CHROME: does the workbench shell render (nav bar + control panel)?`);
+if (!chromeMissing.length) {
+  console.log(`    PASS  all 6 shell controls present (name · state · width · theme · panel toggle · panel)`);
+} else {
+  console.log(`    FAIL  ${chromeMissing.length} missing: ${chromeMissing.join(', ')}`);
+  console.log(`      every prototype in the loop must render inside the workbench shell. Fix workbench.mjs`);
+}
+
 console.log(`\n  COVERAGE: did each checker actually run?`);
 if (!uncovered.length) {
   console.log(`    PASS  all ${CHECKERS.length} checkers left evidence on all ${coverage.length} run(s)`);
@@ -162,7 +199,7 @@ tasksSection();
 console.log(`\n  FORMAT: does each card follow the prescribed shape?`);
 if (!problems.length) {
   console.log(`    PASS  every card follows the prescribed format (${checked} run(s) with ids)\n`);
-  process.exit(uncovered.length ? 1 : 0);
+  process.exit(uncovered.length || chromeMissing.length ? 1 : 0);
 }
 
 console.log(`    FAIL  ${problems.length} card(s) do not follow the prescribed format\n`);
