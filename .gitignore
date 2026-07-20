@@ -12,3 +12,6 @@ workbench-*.html
 design-dashboard.html
 design-replay.html
 doctrine.html
+
+.shots/
+fixtures/dead.html
