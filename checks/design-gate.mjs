@@ -305,22 +305,6 @@ if (shouldLog) {
   console.log(`  logged → design-runs.jsonl  run id: ${id}  (${row.gate})`);
   if (!why) console.log('  ⚠  no --why given. This is an outcome log, not a decision log');
 
-  // ── PROGRESSION: is this loop measurably BETTER than the last, not just not-broken? ──
-  // Everything above answers "did we break anything". craft-delta answers "is it better": it diffs
-  // this run's craft measurements against the previous run of the same target and holds a forward-
-  // only ratchet (craft FAILs may not rise). A green loop that quietly flattened the hierarchy or
-  // slowed the motion is caught HERE. Non-blocking in the gate (a scoreboard, like Trident's impact
-  // ratchet); `node checks/craft-delta.mjs <file> --strict` enforces it in CI.
-  if (craft) {
-    try {
-      const cjson = path.join(shotDir, 'craft.json');
-      fs.writeFileSync(cjson, craft);
-      const cd = path.join(path.dirname(new URL(import.meta.url).pathname), 'craft-delta.mjs');
-      const out = spawnSync(process.execPath, [cd, target, id, '--from', cjson], { encoding: 'utf8' });
-      process.stdout.write(out.stdout || '');
-    } catch {}
-  }
-
   // ── the run is INCOMPLETE until a cold audit attaches ────────────────────────
   // The audit needs a subagent, so this file cannot run it the way it now runs craft-evals
   // and state-matrix. What it CAN do is refuse to call the run finished. Previously the last

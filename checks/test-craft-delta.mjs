@@ -52,6 +52,11 @@ const briefSrc = fs.readFileSync(BRIEF, 'utf8');
 check('audit-brief no longer loads the hallmark skill (token cut is durable)', !/`hallmark`|hallmark audit/i.test(briefSrc));
 check('audit-brief requires a next-improvement entry (progression driver)', /next-improvement/.test(briefSrc));
 
+// the gate wiring is durable: design-gate must still invoke craft-delta, or the loop stops showing
+// progression and the delta silently disappears (prove-durable flagged this reverting green).
+const gateSrc = fs.readFileSync(path.join(HERE, 'design-gate.mjs'), 'utf8');
+check('design-gate still invokes craft-delta (progression wiring is durable)', /craft-delta\.mjs/.test(gateSrc));
+
 fs.rmSync(tmp, { recursive: true, force: true });
 console.log(`\nRESULT: ${fails ? `${fails} FAIL` : 'PASS'}`);
 process.exit(fails ? 1 : 0);

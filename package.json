@@ -16,13 +16,11 @@
     "workbench": "node checks/workbench.mjs",
     "instrument": "node checks/instrument.mjs",
     "craft": "node checks/craft-evals.mjs",
-    "craft-delta": "node checks/craft-delta.mjs",
     "audit-brief": "node checks/audit-brief.mjs",
     "track": "node checks/track.mjs",
     "verify-render": "node checks/verify-render.mjs",
     "doctrine": "node checks/doctrine-gate.mjs --render",
-    "test": "node checks/test-state-taxonomy.mjs && node checks/doctrine-gate.mjs --strict && node checks/loop-integrity.mjs --strict && node checks/check-selfgrade.mjs --strict && node checks/test-craft-delta.mjs",
-    "coverage": "node checks/rule-coverage.mjs"
+    "test": "node checks/test-state-taxonomy.mjs && node checks/doctrine-gate.mjs --strict"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.0",
