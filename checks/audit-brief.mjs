@@ -66,6 +66,10 @@ cannot reach, not re-auditing from scratch — the cheap tier already ran and it
 
 You are auditing the ARTIFACT only. You cannot see why any choice was made, and should not ask.
 
+Ground every design claim in \`docs/design-canon.md\` — the loop's VERIFIED source canon (which authorities
+are real vs which numbers are house heuristics). Cite a VERIFIED canon source, never a folklore threshold
+as if it were authority. If a claim has no canon backing, say so rather than invent one.
+
 ## ALREADY MEASURED: do not RE-DERIVE these, but DO challenge them
 These are measurements WITH their method, **not settled facts**: a check can pass vacuously, and
 one here already did — the focus check once reported PASS off the browser's default ring while the
