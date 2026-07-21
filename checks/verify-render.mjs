@@ -71,24 +71,16 @@ const coverage = steps.filter((s) => s.run.id && (s.run.ts || '') >= COVERAGE_FR
   missing: CHECKERS.filter((c) => !c.has(s)),
 }));
 
-// Serve over http, never file://. A file:// iframe of a sibling is a dead snapshot (CF-070/CF-074):
-// its opaque origin blocks the state-switch and effect scripts do not load, so testing there
-// false-fails a workbench that works fine served. The loop runs over http, so the gate must too.
-const port = await new Promise((res) => {
-  const s = net.createServer();
-  s.listen(0, () => { const p = s.address().port; s.close(() => res(p)); });
-});
-const server = spawn('python3', ['-m', 'http.server', String(port)], { cwd: process.cwd(), stdio: 'ignore' });
-const stopServer = () => { try { server.kill(); } catch {} };
-process.on('exit', stopServer);
-await new Promise((r) => setTimeout(r, 600)); // let the server bind
-
 const browser = await chromium.launch();
 const problems = [];
 const chromeMissing = [];
 try {
   const page = await (await browser.newContext({ viewport: { width: 1280, height: 900 } })).newPage();
-  await page.goto(`http://localhost:${port}/${wb}`, { waitUntil: 'networkidle' });
+  // Load over file:// — the environment where the workbench is opened by double-clicking. The stage
+  // is a srcdoc iframe (the prototype + its effects inlined), so it renders here with no server. Testing
+  // over http instead would let a regression to a `src` iframe — blank over file:// but fine served —
+  // slip straight through. That is the exact bug that shipped: a src stage, blank when opened as a file.
+  await page.goto(`file://${path.resolve(wb)}`, { waitUntil: 'networkidle' });
 
   // ── CHROME. Every prototype iterated in the loop must render inside the workbench shell:
   // the nav bar (name switch, state dropdown, width toggle, theme toggle, panel toggle) and
@@ -104,6 +96,21 @@ try {
     { key: 'control panel', sel: 'aside.panel' },
   ];
   for (const c of CHROME) if (!(await page.$(c.sel))) chromeMissing.push(c.key);
+
+  // STAGE must actually render the design inside the iframe, not just the shell around it. A `src`
+  // iframe of a sibling is BLANK over file:// (opaque origin, contentDocument null) — the exact
+  // "workbench is not there" bug: shell present, design missing. srcdoc fixes it; this keeps it fixed.
+  const stage = await page.evaluate(() => {
+    const fr = document.getElementById('fr');
+    if (!fr) return { ok: false, why: 'no iframe' };
+    try {
+      const d = fr.contentDocument;
+      if (!d) return { ok: false, why: 'contentDocument null — a src iframe blank over file://?' };
+      const chars = (d.body ? d.body.innerText : '').trim().length;
+      return { ok: chars > 0, why: chars > 0 ? '' : 'stage body is empty' };
+    } catch (e) { return { ok: false, why: 'stage blocked: ' + e.message.slice(0, 40) }; }
+  });
+  if (!stage.ok) chromeMissing.push(`stage blank: the design did not render in the frame (${stage.why})`);
 
   const cards = await page.$$('details.run');
   for (const [i, card] of cards.entries()) {
@@ -173,7 +180,6 @@ try {
   }
 } finally {
   await browser.close();
-  stopServer();
 }
 
 const checked = steps.filter((s) => s.run.id).length;

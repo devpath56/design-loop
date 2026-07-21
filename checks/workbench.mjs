@@ -30,6 +30,28 @@ const { src: shotSrc, state } = makeShotSrc();
 // and any fetch behave as they will in a browser.
 const frameSrc = explicitUrl || './' + target.split(path.sep).join('/');
 
+// Inline the prototype into the iframe's srcdoc. THIS is why the stage was blank when the workbench
+// was opened as a file: a `src` iframe of a sibling renders BLANK over file:// (the opaque file
+// origin blocks the nested document load, contentDocument is null). srcdoc has no cross-file load, so
+// the design renders over file:// AND http. Two more moves make it whole:
+//   · inline external effect scripts (`<script src="./effects/..">`) — about:srcdoc cannot resolve a
+//     relative script src, so the marble-ink / kinetic-type layers would silently not load.
+//   · rename `const show =` to `window.show =` so the state dropdown drives the stage same-origin
+//     (srcdoc inherits the parent origin) instead of a ?state reload that only works on a server.
+function buildSrcdoc(file) {
+  let html = fs.readFileSync(file, 'utf8');
+  const dir = path.dirname(path.resolve(file));
+  html = html.replace(/<script\s+src=["'](\.[^"']+)["']\s*>\s*<\/script>/gi, (m, rel) => {
+    try {
+      const p = path.join(dir, rel);
+      if (fs.existsSync(p)) return `<script>\n${fs.readFileSync(p, 'utf8')}\n</script>`;
+    } catch {}
+    return m; // external/CDN scripts stay as-is
+  });
+  return html.replace('const show =', 'window.show =');
+}
+const srcdoc = explicitUrl ? null : buildSrcdoc(target);
+
 const VERD = { PASS: 'ok', FAIL: 'no', BLOCKED: 'hold' };
 
 // One output file per target. A single `design-workbench.html` meant building for a second
@@ -474,7 +496,7 @@ const html = `<!doctype html>
       </button>
     </span>
   </div>
-  <div class="frame"><iframe id="fr" src="${esc(frameSrc)}" title="${esc(target)}. Live"></iframe></div>
+  <div class="frame"><iframe id="fr" ${srcdoc != null ? `srcdoc="${esc(srcdoc)}"` : `src="${esc(frameSrc)}"`} title="${esc(target)}. Live"></iframe></div>
 </div>
 <aside class="panel">
   <div class="ph"><h2>history · ${steps.length} run${steps.length === 1 ? '' : 's'}</h2></div>
@@ -511,11 +533,14 @@ var rs=document.querySelectorAll('details.run');
 rs.forEach(function(d){ d.addEventListener('toggle',function(){
   if(d.open) rs.forEach(function(o){ if(o!==d) o.open=false; });
 });});
-var fr=document.getElementById('fr'), base=fr.getAttribute('src').split('?')[0];
-// State selection navigates the frame rather than reaching into it: a file:// iframe has an
-// opaque origin, so cross-document scripting would fail. A query param works either way.
+var fr=document.getElementById('fr');
+// srcdoc inherits the parent origin, so drive the stage IN PLACE via window.show — no reload, the
+// effect stays alive, and it works over file:// (where a ?state reload of a sibling renders blank).
+// The src fallback is only for an explicit served --url.
 document.getElementById('st').addEventListener('change',function(e){
-  fr.src = e.target.value ? base+'?state='+encodeURIComponent(e.target.value) : base;
+  var name = e.target.value || null;
+  try { if (fr.contentWindow && typeof fr.contentWindow.show === 'function'){ fr.contentWindow.show(name); return; } } catch(err){}
+  var s = fr.getAttribute('src'); if (s){ var base=s.split('?')[0]; fr.src = name ? base+'?state='+encodeURIComponent(name) : base; }
 });
 var phone=false;
 document.getElementById('sz').addEventListener('click',function(e){
@@ -534,7 +559,9 @@ document.getElementById('th').addEventListener('click',function(){
 document.getElementById('tg-file').addEventListener('change',function(e){
   if (e.target.value) location.href = e.target.value;
 });
-document.getElementById('rl').addEventListener('click',function(){ fr.src=fr.src; });
+document.getElementById('rl').addEventListener('click',function(){
+  if (fr.getAttribute('srcdoc')!=null){ var d=fr.getAttribute('srcdoc'); fr.removeAttribute('srcdoc'); fr.setAttribute('srcdoc', d); } else { fr.src=fr.src; }
+});
 document.getElementById('tg').addEventListener('click',function(e){
   var hid=document.body.classList.toggle('collapsed');
   e.currentTarget.setAttribute('aria-pressed', hid?'false':'true');

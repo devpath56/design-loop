@@ -33,6 +33,11 @@ check('every state option is a real state name or the empty default',
 check('the real drawn states are present (error, locked, success)',
   ['error', 'locked', 'success'].every((s) => values.includes(s)));
 
+// the "workbench not there" root cause: a `src` stage iframe is blank over file://. The stage must
+// be srcdoc (inlined prototype) so it renders when the file is opened directly, with effects inlined.
+check('the stage iframe uses srcdoc, not a blank src (renders over file://)', /id="fr"\s+srcdoc=/.test(wb));
+check('the effect layer is inlined into the srcdoc (about:srcdoc cannot fetch a relative src)', wb.includes('MarbleInk'));
+
 console.log(`\n  state options: ${JSON.stringify(values)}`);
 console.log(`RESULT: ${fails ? `${fails} FAIL` : 'PASS'}`);
 process.exit(fails ? 1 : 0);
