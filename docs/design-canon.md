@@ -79,7 +79,7 @@ No book spans all three with authority, so any "the one UX book" claim is really
 | 1 | **Don Norman, *The Design of Everyday Things*, Revised ed. (Basic Books, 2013)** | HCI / cognition — affordances, signifiers, mapping, feedback | The closest thing to a UX monolith: it defines the *vocabulary* (affordance, signifier, mapping) the whole field now argues in. Broad, foundational, discipline-defining. | `[VERIFIED — https://jnd.org/books/the-design-of-everyday-things-revised-and-expanded-edition/, accessed 2026-07-20]` |
 | 2 | **Alan Cooper et al., *About Face: The Essentials of Interaction Design*, 4th ed. (Wiley, 2014)** | interaction design — behaviour, goal-directed design, personas | The methodological backbone of how software should *behave*; originated personas and goal-directed design. The interaction-design counterpart to Ousterhout. | `[VERIFIED — https://www.wiley.com/en-us/About+Face...-p-9781118766576, accessed 2026-07-20]` |
 | 3 | **Steve Krug, *Don't Make Me Think, Revisited*, 3rd ed. (New Riders, 2014)** | usability heuristics — self-evidence, cognitive load, testing | The most-applied practitioner text; turns "reduce thinking" into checkable habits. Owns the pragmatic, ship-it-and-test axis. | `[VERIFIED — https://sensible.com/dont-make-me-think/ + Amazon 9780321965516, accessed 2026-07-20]` |
-| 4 | **Robin Williams, *The Non-Designer's Design Book* (Peachpit, 4th ed. 2015)** — CRAP: Contrast, Repetition, Alignment, Proximity — with **Wathan & Schoger, *Refactoring UI* (2018)** as the modern practical companion | visual / UI craft — hierarchy, spacing, colour, type | The visual-craft axis the academic canon ignores. Williams (CRAP) is the more foundational, broadly-taught text and maps directly onto the loop's hierarchy = size+weight+contrast+spacing; Refactoring UI is the modern product-oriented application of the same principles. | `[VERIFIED — Williams: https://www.peachpit.com/store/non-designers-design-book-9780133966152 · Refactoring UI: https://www.refactoringui.com/, accessed 2026-07-20]` |
+| 4 | **Wathan & Schoger, *Refactoring UI* (2018)** for a developer audience — or **Robin Williams, *The Non-Designer's Design Book* (Peachpit, 4th ed. 2015)** (CRAP: Contrast, Repetition, Alignment, Proximity) for a general one | visual / UI craft — hierarchy, spacing, colour, type | The visual-craft axis the academic canon ignores. **Not a foundational-vs-companion ranking** (an earlier draft's error, corrected). Both cover the *same* visual-craft layer, indexed differently: Williams teaches the four print/graphic fundamentals as transferable *theory* for any reader; *Refactoring UI* hands a **developer** copy-pasteable UI recipes and is explicitly *not* a fundamentals deep-dive. Pick by **audience × need**. For this loop — a dev/PM learning design — **Refactoring UI is the working primary** (tactics in the learner's own language); Williams is the *why-it-works* backstop that transfers off the web. | `[VERIFIED — Refactoring UI: https://www.refactoringui.com/ (dev-targeted tactics, per publisher + reviews) · Williams: https://www.peachpit.com/store/non-designers-design-book-9780133966152, accessed 2026-07-20]` |
 
 Specialist authorities that sit *under* the canon for specific loop mechanisms: **Thomas & Johnston, *The Illusion of Life*** (motion principles) and **Val Head, *Designing Interface Animation*** (interface motion); **WCAG** (accessibility floor); **Rodden et al. HEART** and **Basili et al. GQM** (measurement).
 
@@ -139,7 +139,7 @@ is the whole point of the automation-ceiling sources (#13).
 | Cooper et al., About Face 4th ed. 2014 | VERIFIED (this session) |
 | Krug, Don't Make Me Think Revisited 3rd ed. 2014 | VERIFIED (this session) |
 | Wathan & Schoger, Refactoring UI 2018 | VERIFIED (this session) |
-| Robin Williams, The Non-Designer's Design Book, Peachpit 4th ed. 2015 (CRAP) | VERIFIED (this session; added in the Trident audit as the foundational visual-craft text) |
+| Robin Williams, The Non-Designer's Design Book, Peachpit 4th ed. 2015 (CRAP) | VERIFIED (this session; added as the general-audience counterpart to Refactoring UI's dev-targeted tactics — same layer, different reader, NOT ranked above it) |
 | Ousterhout, A Philosophy of Software Design 2018/2021 | VERIFIED (this session) |
 | Style Dictionary (OSS) / axe-core (OSS) | VERIFIED (this session / research-file) |
 | 100ms "instant" perception threshold | UNVERIFIED (primary not fetched; Miller 1968 / Nielsen named) |
@@ -154,6 +154,11 @@ explicitly labelled a house heuristic in §1 — none is presented as a confiden
 citations independently. One misattribution was caught and corrected — the Doherty "400ms" figure was
 tagged VERIFIED but had been checked against secondary retellings, not the primary paper; it is now
 demoted to UNVERIFIED and the 400ms band boundary is re-grounded in Material Motion. Robin Williams'
-*The Non-Designer's Design Book* was added as the foundational visual-craft text (verified; the audit
-had it as "…Guide", corrected to "…Book"). This is the exact failure mode — a confident-but-unchecked
-citation — that the RAT gate's mandatory VERIFIED/UNVERIFIED tagging existed to surface.
+*The Non-Designer's Design Book* was added (verified; the audit had it as "…Guide", corrected to
+"…Book"). A later correction (post-audit) fixed a *reasoning* error rather than a citation one: the
+draft had ranked Williams "more foundational" than *Refactoring UI* and demoted the latter to
+"companion." That conflated authority-by-breadth with fit-to-audience. Both texts cover the same
+visual-craft layer; the right axis is the reader — for a dev/PM, *Refactoring UI*'s tactics are the
+working primary, Williams the transferable-theory backstop. This is the exact failure mode — a
+confident-but-unchecked citation, or a plausible-but-mis-axed judgement — that the RAT gate's
+mandatory VERIFIED/UNVERIFIED tagging and the decorrelated audit existed to surface.
