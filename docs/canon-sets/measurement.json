@@ -1,0 +1,17 @@
+{
+  "query": "authoritative sources design-loop uses to teach MEASUREMENT + accessibility (what to gate, what to measure)",
+  "mode": "set",
+  "audience": "a dev/PM becoming an IC product designer",
+  "job": "gate the compliance floor and measure the right thing",
+  "coverage_axis": "this is a standards+research domain by design — IC authorship is not expected",
+  "items": [
+    { "name": "WCAG 2.2 (W3C/WAI)", "basis": "institutional", "medium": "spec",
+      "caveat": "a normative standard, not craft; the floor, not the ceiling", "covers": "contrast, target size" },
+    { "name": "HEART (Rodden, Hutchinson & Fu, CHI 2010)", "basis": "aged-classic", "medium": "paper",
+      "covers": "goals-signals-metrics" },
+    { "name": "GQM (Basili, Caldiera & Rombach, 1994)", "basis": "aged-classic", "medium": "paper",
+      "covers": "goal-question-metric" },
+    { "name": "axe-core (Deque, OSS)", "basis": "institutional", "medium": "tool",
+      "caveat": "automation ceiling ~20-30% of WCAG; a floor detector, never a certificate", "covers": "the automatable a11y subset" }
+  ]
+}

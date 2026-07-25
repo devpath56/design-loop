@@ -116,6 +116,46 @@ is the whole point of the automation-ceiling sources (#13).
 
 ---
 
+## 5. Practitioner-bucket coverage — the by-and-for-IC-designer audit
+
+Dogfooded the CF-078 set-curation guard (`authority-guard.mjs mode:"set"`) on one source-set per skill
+(`docs/canon-sets/*.json`). Honest scope (RAT probe `p-canon-ic-audit`, falsified + overridden): the
+guard is sound for empty-bucket / monoculture / caveat detection, but its basis enum
+{aged-classic, institutional, living-practitioner} **cannot** separate an IC-BUILDER text (Refactoring UI)
+from practitioner-METHODOLOGY (Cooper/Krug) — so a PASS means "has a practitioner," not
+"by-and-for-IC-builder." That finer line is carried in prose here.
+
+Guard output below is the REAL exit code **after wiring** the two added sources into the gated JSON
+(re-run `node authority-guard.mjs docs/canon-sets/<skill>.json` to reproduce):
+
+| skill | guard (after wiring) | by/for-IC anchor | reading |
+|---|---|---|---|
+| visual craft | PASS | **Refactoring UI** (Wathan & Schoger) | strong — the model by/for-IC text |
+| motion | PASS | **Val Head, Designing Interface Animation** | covered but THIN (one IC source; the 80ms/100ms timing numbers stay UNVERIFIED house heuristics) |
+| states | **PASS** (was FAIL ×3) | **Scott Hurff, "The UI Stack"** (wired into `states.json`) | gap CLOSED and gated: Hurff (living-practitioner) clears empty-bucket + basis + medium monoculture |
+| interaction | **FAIL (medium-monoculture)** | **Tidwell, Designing Interfaces** (wired) | authorship gap closed (Tidwell is the by/for-IC-builder patterns text beside Cooper/Krug methodology); but the set is books-only, so the guard still flags NO current-practice source — a real, separate, UN-closed gap |
+| measurement / a11y | FAIL (empty-bucket) | none, correctly | standards+research domain; IC authorship is not expected — the guard OVER-fires here (a documented limit, not a gap) |
+
+**Two IC-practitioner sources WIRED into the gated sets (VERIFIED — the guard output above is post-wiring):**
+- **Scott Hurff, "The UI Stack" — *Designing Products People Love* (O'Reilly, 2016; article 2015).** The states
+  skill's by/for-IC anchor (Hurff was then **Product Manager and Lead Designer at Tinder**). On the folklore
+  correction: `design.md` calls its four states (loading/empty/error/success) folklore; Hurff's UI Stack is the
+  closest **named practitioner lineage**, but it is a *five*-state model (ideal/empty/error/partial/loading) that
+  does **not** map 1:1 — it adds *ideal* and *partial* and omits *success*. So Hurff is the lineage, not a verbatim
+  origin of design.md's specific four. `[VERIFIED — https://www.scotthurff.com/posts/why-your-user-interface-is-awkward-youre-ignoring-the-ui-stack/, accessed 2026-07-25]`
+- **Jenifer Tidwell, *Designing Interfaces: Patterns for Effective Interaction Design* (O'Reilly, 3rd ed. 2020,
+  w/ Brewer & Valencia).** The interaction skill's by/for-IC-builder patterns text. Wiring it closes the authorship
+  gap but **NOT** the guard's `medium-monoculture` FAIL — that gate is about medium diversity (the set is all books),
+  a separate "no current-practice source" gap left open and noted, not hidden. `[VERIFIED — https://www.oreilly.com/library/view/designing-interfaces-3rd/9781492051954/, accessed 2026-07-25]`
+
+**Net answer to "is design-loop built on by-and-for-IC texts like Refactoring UI?"** After this audit: yes and
+gated for visual craft (Refactoring UI) and states (Hurff, now PASS); yes for interaction *authorship* (Tidwell)
+though the set is still books-only (medium-monoculture unresolved, noted); thin but real for motion (Val Head);
+and correctly standards/research-grounded, no IC author, for measurement/a11y. The distinction the guard cannot
+certify: Cooper/Krug/Norman anchor interaction conceptually but are methodology/academic, not IC-builder recipes.
+
+---
+
 ## Verification log
 
 | citation | status |
@@ -134,6 +174,8 @@ is the whole point of the automation-ceiling sources (#13).
 | Deque / axe-core 57% (as vendor claim) + Playwright a11y | VERIFIED (research-file) |
 | HEART — Rodden, Hutchinson & Fu, CHI 2010 | VERIFIED (research-file, primary) |
 | GQM — Basili, Caldiera & Rombach 1994 | VERIFIED (research-file, primary) |
+| Scott Hurff, "The UI Stack" / Designing Products People Love (O'Reilly 2016) | VERIFIED (this session; primary — scotthurff.com + O'Reilly) |
+| Jenifer Tidwell, Designing Interfaces 3e (O'Reilly 2020) | VERIFIED (this session; primary — O'Reilly) |
 | Miller 7±2 misapplication (+ Cowan 2001 ≈4) | VERIFIED (research-file) |
 | Norman, Design of Everyday Things, 2013 | VERIFIED (this session) |
 | Cooper et al., About Face 4th ed. 2014 | VERIFIED (this session) |

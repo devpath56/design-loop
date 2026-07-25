@@ -1,0 +1,13 @@
+{
+  "query": "authoritative sources design-loop uses to teach VISUAL CRAFT (hierarchy, spacing, colour, type)",
+  "mode": "set",
+  "audience": "a dev/PM becoming an IC product designer",
+  "job": "rank size/weight/contrast/spacing so the screen says what matters",
+  "coverage_axis": "authority-basis x knowledge-half-life",
+  "items": [
+    { "name": "Refactoring UI (Wathan & Schoger, 2018)", "basis": "living-practitioner", "medium": "ebook",
+      "covers": "hierarchy, spacing, colour, de-emphasis — copy-pasteable UI tactics", "wins_when": "a builder needs to ship a credible UI now" },
+    { "name": "The Non-Designer's Design Book (Robin Williams, 2015)", "basis": "aged-classic", "medium": "book",
+      "covers": "CRAP: contrast, repetition, alignment, proximity as transferable theory", "wins_when": "you want the why that carries off the web" }
+  ]
+}

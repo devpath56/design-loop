@@ -1,0 +1,36 @@
+{
+  "query": "authoritative sources design-loop uses to teach the STATES a screen owes (loading/empty/error/lockout)",
+  "mode": "set",
+  "audience": "a dev/PM becoming an IC product designer",
+  "job": "design every state a screen owes, not just the happy path",
+  "items": [
+    {
+      "name": "NN/g \u2014 Empty States in Application Design",
+      "basis": "institutional",
+      "medium": "web",
+      "caveat": "research-consultancy article, not IC-authored; a coverage prompt, not a craft authority",
+      "covers": "the empty state"
+    },
+    {
+      "name": "Authgear login UX guide",
+      "basis": "institutional",
+      "medium": "web",
+      "caveat": "vendor doc; product-marketing-adjacent, use for the lockout checklist only",
+      "covers": "auth lockout"
+    },
+    {
+      "name": "FusionAuth account-lockout docs",
+      "basis": "institutional",
+      "medium": "web",
+      "caveat": "vendor doc; implementation reference, not a design authority",
+      "covers": "rate-limit / lockout"
+    },
+    {
+      "name": "Scott Hurff \u2014 The UI Stack (Designing Products People Love, O'Reilly 2016)",
+      "basis": "living-practitioner",
+      "medium": "book",
+      "covers": "the states a screen owes: ideal/empty/error/partial/loading",
+      "wins_when": "you are designing beyond the happy path"
+    }
+  ]
+}

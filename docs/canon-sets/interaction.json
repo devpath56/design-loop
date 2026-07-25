@@ -1,0 +1,36 @@
+{
+  "query": "authoritative sources design-loop uses to teach INTERACTION (behaviour, flows, usability)",
+  "mode": "set",
+  "audience": "a dev/PM becoming an IC product designer",
+  "job": "make a screen behave the way the user models the task",
+  "items": [
+    {
+      "name": "The Design of Everyday Things (Norman, 2013)",
+      "basis": "aged-classic",
+      "medium": "book",
+      "covers": "affordances, signifiers, mapping, feedback \u2014 the conceptual floor",
+      "wins_when": "you need shared vocabulary for why a control is (un)usable"
+    },
+    {
+      "name": "About Face 4e (Cooper et al., 2014)",
+      "basis": "living-practitioner",
+      "medium": "book",
+      "covers": "interaction methodology, goal-directed design",
+      "wins_when": "you are structuring behaviour, not just a screen"
+    },
+    {
+      "name": "Don't Make Me Think, Revisited (Krug, 2014)",
+      "basis": "living-practitioner",
+      "medium": "book",
+      "covers": "pragmatic usability, self-evidence",
+      "wins_when": "you need a fast usability read"
+    },
+    {
+      "name": "Designing Interfaces 3e (Tidwell, Brewer & Valencia, O'Reilly 2020)",
+      "basis": "living-practitioner",
+      "medium": "book",
+      "covers": "interaction pattern language",
+      "wins_when": "you want reusable interaction patterns, not just methodology"
+    }
+  ]
+}

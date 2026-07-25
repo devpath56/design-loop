@@ -1,0 +1,15 @@
+{
+  "query": "authoritative sources design-loop uses to teach MOTION (timing, staging, meaning)",
+  "mode": "set",
+  "audience": "a dev/PM becoming an IC product designer",
+  "job": "make motion communicate cause and hierarchy, not decorate",
+  "items": [
+    { "name": "Designing Interface Animation (Val Head, 2016)", "basis": "living-practitioner", "medium": "book",
+      "covers": "interface motion as meaning, timing craft", "wins_when": "you are designing UI motion for a product" },
+    { "name": "The Illusion of Life (Thomas & Johnston, 1981)", "basis": "aged-classic", "medium": "book",
+      "covers": "staging, the 12 principles", "wins_when": "you need the durable craft roots of motion" },
+    { "name": "Material Design — Motion (Google)", "basis": "institutional", "medium": "docs",
+      "caveat": "vendor spec / platform convention, not a controlled study; use for consistent defaults, not as timing evidence",
+      "covers": "duration + easing bands", "wins_when": "you want platform-consistent defaults" }
+  ]
+}
