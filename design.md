@@ -5,6 +5,19 @@ The loop reads this every run. Keep it short and opinionated; edit it as your ta
 first and defers to it, so your taste here overrides Hallmark's defaults.
 (Generate/extend it from references with `hallmark study <url|screenshot>` → "lock the DNA" → paste here.)
 
+## Competencies + sources (the IC-principal spine)
+The loop grades against the principal **design-engineer** competency set. The full **VERIFIED** source
+mashup — the most precise unit per competency (a chapter, an essay, a spec section, a case; not a whole
+book) — lives in [`docs/competency-map.md`](docs/competency-map.md); the teaching canon is
+[`docs/design-canon.md`](docs/design-canon.md).
+- Foundations · visual craft · typography · interaction & states · motion · design systems/tokens ·
+  **front-end craft** · performance (Core Web Vitals) · accessibility · prototyping · research/measurement ·
+  product strategy · critique.
+- **Cite the precise unit, never a whole book, and never a folklore threshold as authority.** Each
+  competency's source is tagged VERIFIED in the map; an untagged claim is opinion, labeled as such.
+- The two **stance axes** (taste↔evidence, craft↔leverage) and the four archetypes are in the map §3 —
+  they are perspectives to switch between, not a competency to score.
+
 ## Non-negotiables (the gate enforces these)
 - **Contrast** — body text ≥ 4.5:1, large text/UI ≥ 3:1 (WCAG AA). Light-gray-on-white is the #1 slip.
 - **Names** — every control has an accessible name (icon-only buttons need `aria-label`).
@@ -101,6 +114,8 @@ the states it owes in `<meta name="ui-states" content="...">`; state-matrix chec
   state is rate-limit / lockout, which carries security weight and is a documented login state,
   not an edge case. [Authgear login UX guide; FusionAuth account-lockout docs]
 
-Sourcing note: the bare "loading/empty/error/success" four is folklore, traceable to design
-blogs that disagree with each other, not to an authority. Where a state claim drives a check,
-it cites a source or it is labeled opinion.
+Sourcing note: the states-a-screen-owes concept has a **named practitioner lineage** — Scott Hurff's
+*UI Stack* (ideal/empty/error/partial/loading), *Designing Products People Love* (O'Reilly 2016). The
+four above (loading/empty/error/success) are **not** his five — he adds *ideal* + *partial* and omits
+*success* — so cite Hurff as the lineage, not this specific four as gospel. Where a state claim drives a
+check, it cites a source or is labeled opinion. [see `docs/competency-map.md` #4]
