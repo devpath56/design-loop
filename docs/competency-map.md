@@ -24,7 +24,11 @@ Foundations come first because they are the one layer true **regardless of which
 
 ---
 
-## 2. The competency table (all 13, bar + verified source)
+## 2. The competency table (all 16, bar + verified source)
+
+Rows 1–13 are the craft spine. **14–16 are what make this a *design-engineer* map rather than a designer
+map:** behavior design (does it change behavior, not just read well), engineering-for-feel (which design
+qualities are architecture), and driving an agent to a craft bar.
 
 | # | competency | bar (principal-level) | source(s) | tag |
 |---|---|---|---|---|
@@ -40,8 +44,52 @@ Foundations come first because they are the one layer true **regardless of which
 | 11 | Research & measurement | Runs/interprets think-aloud sessions without contaminating them; designs a **Goals→Signals→Metrics** system tied to product goals, not whatever's easy to instrument | Rodden, Hutchinson, Fu, "Measuring UX on a Large Scale (HEART)," CHI 2010 · Nielsen, "Thinking Aloud," NN/g · Basili, Caldiera, Rombach, "GQM," 1994 | VERIFIED — [ACM/HEART](https://dl.acm.org/doi/abs/10.1145/1753326.1753687) · [nngroup](https://www.nngroup.com/articles/thinking-aloud-the-1-usability-tool/) · GQM by citation record (primary text not fetched) |
 | 12 | Product strategy / business value | Traces a design decision to a **business metric** (revenue, retention, cost-to-serve) in front of an exec; reframes an ambiguous ask into the **right problem** before proposing a solution | Sheppard et al., "The Business Value of Design," McKinsey Quarterly (Oct 2018) · Tim Brown, "Design Thinking," HBR (2008) | VERIFIED — [mckinsey.com](https://www.mckinsey.com/capabilities/tech-and-ai/our-insights/the-business-value-of-design) · [hbr.org](https://hbr.org/2008/06/design-thinking) |
 | 13 | Critique & communication | Runs critique that surfaces the **real disagreement** (not taste-policing), separates problem from solution; presents a decision as a narrative with stakes and resolution, not a screen walkthrough | Connor & Irizarry, *Discussing Design* (O'Reilly, 2015) · Quesenbery & Brooks, *Storytelling for User Experience* (Rosenfeld, 2010) | VERIFIED — [oreilly](https://www.oreilly.com/library/view/discussing-design/9781491902394/) · [rosenfeld](https://rosenfeldmedia.com/books/storytelling-for-user-experience/) |
+| 14 | **Behavior design (B=MAP)** | Names which of **M, A, or P** is the binding constraint *before* proposing an intervention; refuses to add motivation when the real problem is friction; quotes real effect sizes with method, never vendor round-numbers; can state where technique crosses into manipulation | **BJ Fogg, Fogg Behavior Model** (published 2009) — B=MAP, the three must converge *at the same moment* · *Tiny Habits* (2019) · *Persuasive Technology* (2002) · **Duolingo** first-party: Streak Wager D7 **+14%**, Streak Freeze **+10%** long-term · **HBS case "Duolingo: On a 'Streak'"** · **BOUNDARY: Harry Brignull, *Deceptive Patterns*** (Testimonium, 2023; he coined "dark patterns," 2010) | VERIFIED — [behaviormodel.org](https://www.behaviormodel.org/) · [bjfogg.com](https://www.bjfogg.com/) · [Duolingo streaks](https://blog.duolingo.com/how-streaks-keep-duolingo-learners-committed-to-their-language-goals/) · [HBS](https://www.hbs.edu/faculty/Pages/item.aspx?num=66865) · [deceptive.design](https://deceptive.design/) (free online) |
+| 15 | **Engineering-for-feel** (design qualities that are architecture) | Diagnoses which "design" problem is actually an **architecture** problem, and reaches for the right substrate: instant-feel → local-first + optimistic mutations; smoothness → compositor-only animation; responsiveness → INP discipline and work off the main thread. Never tries to *design* a latency problem | **Ink & Switch, "Local-first software"** (the manifesto Linear's architecture descends from) · **Linear technical breakdown** (IndexedDB as primary store, optimistic mutations, WebSocket deltas, granular observables → surgical re-renders) · web.dev **INP** · Paul Lewis **FLIP** | VERIFIED — [inkandswitch.com/local-first](https://www.inkandswitch.com/local-first/) · [performance.dev](https://performance.dev/how-is-linear-so-fast-a-technical-breakdown) · [web.dev/inp](https://web.dev/articles/inp) · [aerotwist](https://aerotwist.com/blog/flip-your-animations/) |
+| 16 | **Driving an agent to a craft bar** (Claude Code) | Ships UI through an agent while holding craft: deterministic gates enforce the measurable floor, a **decorrelated** model audits what scripts cannot reach, every fix becomes a check, and no craft claim is accepted on the maker model's own word | **No book exists.** Authority is method, and the method is this repo: `make → check → gate → learn` (`design-gate`, `craft-evals`, cold audit, `teach-gate`, forward-only ratchets) + Trident (Simba/Do-er/Auditor over one failure SSOT). House-rule 1 orders the tiers: deterministic root-cause > deterministic detection > LLM-judge > written reminder | `[UNVERIFIED — no external authority exists for this competency; it is emerging practice. Stated as method, not citation. This is the honest state, not a gap to paper over.]` |
 
 ---
+
+## 2b. The stack (locked) and its sources
+
+The competencies above are stack-agnostic principles. The **build target** is fixed, so each principle
+has an implementation authority. Chosen for the high-craft convergence (Linear/Vercel/Stripe all sit on
+or near it) and because it is the stack an agent is most fluent in.
+
+**React + TypeScript · Tailwind · Radix · shadcn/ui · Motion**
+
+| layer | authority | what it settles | tag |
+|---|---|---|---|
+| **A11y patterns** | **W3C WAI-ARIA Authoring Practices Guide (APG)** | *which* interaction pattern is correct (roles, states, keyboard contract) | VERIFIED — [w3.org APG](https://www.w3.org/WAI/ARIA/apg/) |
+| **A11y implementation** | **Radix Primitives** — adheres to WAI-ARIA APG, tested with NVDA/JAWS/VoiceOver; owns aria/role attributes, focus management, keyboard nav. Each component names the APG pattern it implements | you do not hand-roll a dialog's focus trap. Radix is the floor; #9's bar is knowing *why* it is correct | VERIFIED — [radix-ui accessibility](https://www.radix-ui.com/primitives/docs/overview/accessibility) |
+| **Motion** | **Motion** (formerly Framer Motion; independent + renamed mid-2025, `framer-motion` → `motion`, import `motion/react`). Hybrid engine: native Web Animations API + ScrollTimeline for 120fps, falls back to JS only for spring physics, interruptible keyframes, gesture tracking | ties #5 and #7 together: the library keeps you on the compositor by default, which is the FLIP lesson encoded | VERIFIED — [motion.dev/docs/react](https://motion.dev/docs/react) |
+| **Styling / scale** | **Tailwind** | the constrained spacing/type/color scales are *Refactoring UI's philosophy in code* — **same author (Adam Wathan)**. #2's principles and this layer are one lineage, not two | VERIFIED (authorship) |
+| **Component distribution** | **shadcn/ui** — not a package: raw components copied into your project, **you own the code** | design-engineer-relevant by construction: components are *yours to shape*, so craft debt is yours too. No "the library won't let me" excuse | VERIFIED |
+
+**Why this composes:** a Dialog uses **Radix** for focus management, **Tailwind** for appearance, **Motion**
+for enter/exit. They do not fight. The failure mode to guard against is treating that convergence as
+*taste settled* — the stack gives you a floor, and every exemplar bar below sits well above it.
+
+## 2c. Bar exemplars, per competency
+
+One product is not the bar for everything. Assigning them per competency is what stops "design like X"
+from becoming cargo-culting.
+
+| competency | bar exemplar | what it anchors |
+|---|---|---|
+| visual craft, states, front-end, performance | **Linear · Stripe · Vercel** | restraint, density-without-noise, craft in code |
+| keyboard-first interaction, latency discipline | **Superhuman** | ⌘K, everything reachable without a mouse, latency as a *design* constraint |
+| motion | **Linear (functional) vs Duolingo (expressive)** | taught as a **choice**, not a default. See §3 |
+| behavior design (#14) | **Duolingo** | first-party experiment evidence + the ethics boundary |
+| prototyping | **Vercel · Duolingo** (prototype-first workflow) | code prototypes that graduate to production |
+| engineering-for-feel (#15) | **Linear** | the sync engine, not the stylesheet |
+
+**The motion pair is the most useful thing in this table.** Linear's motion is sub-perceptual and
+functional (clarify state, get out of the way). Duolingo's is expressive character animation (build
+attachment) — they acquired the motion studio **Hobbes** (2024), and their Chief Design Officer names
+character illustration and animation as central to the product. Both are right in their own domain. If you
+only ever read the Linear/Val Head line you will produce restrained motion **by default** rather than by
+decision, which is the difference between taste and habit.
 
 ## 3. The two axes competence can't rank — and the four archetypes
 
@@ -105,3 +153,25 @@ overstating the evidence."*
 - **Adobe Spectrum / Salesforce Lightning token docs** — product reference, not argued essays; Curtis + the W3C spec are more precise.
 - **Jenifer Tidwell, *Designing Interfaces*** — verified (O'Reilly 3e 2020), but a UI-pattern library; wrong fit for the prototyping/research/strategy/critique rows here (it lives in `design-canon.md` for interaction).
 - **Confidence caveats:** GQM's primary Wiley text was confirmed by citation record, not fetched; the McKinsey and Challenger-Sale exact figures are corroborated-secondary (primary PDFs timed out) — the *direction* and *existence* are solid, the precise N/percentages carry that one caveat.
+
+### Added with rows 14–16 + the stack section
+
+- **Duolingo gamification "60% / 40% / 30%" figures: REJECTED.** Round numbers with no method and no N,
+  sourced to gamification **vendor** content-marketing sites. Same shape as the Doherty "400ms" this canon
+  already demoted. Cite Duolingo's own reported effects instead (Streak Wager D7 +14%, Streak Freeze +10%),
+  which are *smaller and more specific* — the reliable tell that a number is real rather than sold.
+- **Duolingo engineering hub: scoped honestly.** Its content skews organizational/recruiting (FinOps,
+  eng-manager and eng-leadership posts) more than implementation craft. Cited as an org-practice source, not
+  as a front-end-craft authority; Duolingo's rigorous first-party tier is the **Research Lab** (50+
+  peer-reviewed SLA papers, incl. *Foreign Language Annals*).
+- **Nir Eyal, *Hooked* (2014) / *Indistractable* (2019):** `[UNVERIFIED — searched this session, not confirmed
+  against a publisher page]`. Named as a candidate for #14's boundary only. Brignull is the verified boundary
+  source; Eyal is not cited until verified.
+- **Duolingo prototype-first Figma case study (Aug 2025):** `[UNVERIFIED — referenced via a secondary
+  newsletter, direct URL not confirmed]`. The prototype-first *claim* is attributed loosely; #10's verified
+  anchor remains Vercel + IDEO U.
+- **Competency #16 carries no external authority, by finding not by omission.** No book teaches driving an
+  agent to a craft bar. Recording it as method (this repo's loop) with an UNVERIFIED tag is the honest
+  encoding; inventing a citation for it would be the exact failure this document exists to prevent.
+- **`B=MAT` vs `B=MAP`:** the model was originally B=MAT (T for Trigger), renamed to B=MAP because real
+  prompts are richer than mechanical triggers. Citing "B=MAT" signals working from superseded material.

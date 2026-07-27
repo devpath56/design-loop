@@ -12,7 +12,17 @@ book) — lives in [`docs/competency-map.md`](docs/competency-map.md); the teach
 [`docs/design-canon.md`](docs/design-canon.md).
 - Foundations · visual craft · typography · interaction & states · motion · design systems/tokens ·
   **front-end craft** · performance (Core Web Vitals) · accessibility · prototyping · research/measurement ·
-  product strategy · critique.
+  product strategy · critique · **behavior design (B=MAP)** · **engineering-for-feel** ·
+  **driving an agent to a craft bar**.
+- **Stack (locked):** React + TS · Tailwind · Radix (WAI-ARIA APG floor) · shadcn/ui · Motion. Tailwind's
+  constrained scales are Refactoring UI's principles in code (same author), so #2 and the styling layer are
+  one lineage.
+- **Bar is per competency, not one product:** Linear/Stripe/Vercel (craft, restraint) · Superhuman
+  (keyboard-first, latency) · Duolingo (behavior design; expressive motion as the *counter*-position to
+  Linear's functional motion) · Linear again for engineering-for-feel (the sync engine, not the stylesheet).
+- **Some design problems are architecture problems.** Instant-feel is local-first + optimistic mutations;
+  smoothness is compositor-only animation; responsiveness is INP discipline. Do not try to *design* a
+  latency problem.
 - **Cite the precise unit, never a whole book, and never a folklore threshold as authority.** Each
   competency's source is tagged VERIFIED in the map; an untagged claim is opinion, labeled as such.
 - The two **stance axes** (taste↔evidence, craft↔leverage) and the four archetypes are in the map §3 —
