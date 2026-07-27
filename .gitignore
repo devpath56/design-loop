@@ -15,3 +15,9 @@ doctrine.html
 
 .shots/
 fixtures/dead.html
+
+# uploaded source books (copyrighted, shadow-library copies) — LOCAL grounding only.
+# Never commit or push: the repo is public, and distributing these would be infringement.
+Source authority content/
+*.pdf
+*.epub
