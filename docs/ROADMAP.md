@@ -18,6 +18,17 @@ Derived with the IC-principal SWE advisor, and it replaced a worse rule of mine.
 Procedure: enumerate **decisions, not tasks** → tag each one-way or two-way → count fan-out (how many
 other decisions read it) → the path is the one-way chain only.
 
+**The classifier, which the framing normally lacks.** Bezos's Type 1 / Type 2 (2015 shareholder
+letter, verified verbatim) gives the categories but **no procedure for sorting a decision into them**.
+The workable classifier: *a decision is one-way to the degree that other work has already been built
+on top of it.* That makes classification a fan-out measurement rather than a judgement call, which is
+also what keeps this rule from being taste in a lab coat.
+
+**What this rule is FOR, corrected 2026-08-01.** Door-type tells you **where to spend deliberation**.
+It does **not** tell you what to schedule. Scheduling is answered by the constraint (Theory of
+Constraints step 1). Conflating the two put this roadmap's own tier 1 and tier 2 in the wrong order
+on first writing — see §2.
+
 **What it replaced.** My proposal was "order by cost-to-change-later × blocks-other-work." The advisor
 rejected it: that formula **schedules the non-bottleneck**. It optimises engineering time, and at v0
 engineering time is not the constraint. **Decision latency is.**
@@ -63,10 +74,17 @@ Until then it stays a lens.
 
 Derived by applying §1 to design-loop itself.
 
+**REVISED 2026-08-01 after external verification.** The first draft ranked by door-type, which is the
+wrong instrument for scheduling. TOC step 1 says identify the **constraint** and subordinate everything
+to it. The constraint is React grading: until the loop can see the artifact, no runs happen on real
+work, so the pre-registered priors never accumulate either. Capture is one-way and cheap (a form plus
+a jsonl row), so it **rides along as a subordinate item** rather than competing for the constraint's
+resource. Door-type still decides where deliberation is spent; it does not decide order.
+
 | tier | item | door | why here |
 |---|---|---|---|
-| **1** | **Capture: pre-register + hit/miss on loop runs** | **one-way** | The only genuinely unrecoverable item. Every run without it is an observation lost forever |
-| **2** | **React / component grading** | two-way | Not irreversible, but it is the **bottleneck**: the loop cannot see the artifact the work now produces |
+| **1** | **React / component grading** | two-way | **The constraint.** The loop cannot see the artifact the work now produces. Everything downstream, including accumulating rated sessions, is gated on it |
+| **1b** | **Capture: pre-register + hit/miss on loop runs** | **one-way** | Genuinely unrecoverable, and cheap enough not to compete with the constraint. Ships alongside tier 1, not after it. Its *value* only materialises at ≈5 rated sessions (the spec says so), but its *cost of omission* starts on run one |
 | **3** | Generalise **A2** (a null must never render as zero) and **A6** (unavailable ≠ empty) into `design.md` + `craft-evals` | two-way | Cheap, compounds over every future screen, and A6 is a real hole in the state matrix |
 | **4** | Close #8's measurement gap (LCP/INP/CLS); add A5/A9 greppable checks; `door` field on design-rat | two-way | Mechanical once tier 2 exists |
 | **5** | More competencies, more sources, workbench visual work | two-way | Regeneratable, therefore schedule, not architecture |
@@ -160,6 +178,72 @@ build on the real stack. Unresolved.
   contracts, work sequencing, passive feedback capture, production observability, and v0 distribution
   are all uncovered by the competency map. The map is a craft-quality map with no delivery-systems
   column.
-- **External verification of the DORA batch-size evidence, statistical power at low N, and the
-  one-way/two-way door sourcing was still running when this was written.** Nothing here rests on it;
-  §2's tier-1-vs-2 question is the thing it should settle.
+- **External verification completed 2026-08-01.** It settled §2's tier question (against my first
+  ordering) and produced the corrections in §7.
+
+---
+
+## 7 · External verification, 2026-08-01
+
+Evidence separated into three tiers, because treating them alike is how folklore enters a canon.
+
+### Tier 1 — genuinely evidenced
+
+| finding | source |
+|---|---|
+| **A/B testing a v0 is arithmetically undefined, not merely hard.** n = 16σ²/Δ² per variant at 95%/80%. Worked example: **>409,000 users per arm** to detect a 5% revenue change; 7,600 for a 20% conversion change. Sensitivity is squared, so 5%→20% cuts the requirement 16-fold | Kohavi, Longbotham, Sommerfield, Henne, *Controlled experiments on the web*, DMKD 18:140–181 (2009), §3.2 |
+| Kohavi's own floor: **at least thousands of active users**, and only for large effects. 10× sensitivity costs 100× users | *Online Controlled Experiments at Large Scale*, KDD 2013 |
+| **Peeking is a real, measured failure.** Airbnb's price-filter test crossed p<0.05 at day 7 with a 4% effect, then resolved to null | Overgoor, Airbnb Tech Blog, 2014 |
+| **5 users is a mean, not a fact.** Nielsen: L=31% → ~85%, but he also states **15 users** to find all problems, and 5-per-iteration ≠ 5-per-project. Faulkner (2003, n=60, resampled): realized range **55–99%**. Spool & Schroeder (2001, n=49): **35%**, with purchase-blocking problems surfacing only at participants 13 and 15 | Nielsen 2000; Faulkner, *BRMIC* 35(3); Spool & Schroeder, CHI EA 2001 |
+| **Nielsen's own sequencing:** the first several studies should be **qualitative**; add quantitative only once qualitative research is routine | NN/g, 2006 |
+| **DORA small batches:** predicts delivery and organisational performance. Trunk-based development is a named capability (≤3 active branches, merge daily) | dora.dev; *Accelerate* (Forsgren, Humble, Kim) |
+| **DORA's boundary, to state whenever citing it:** cross-sectional and inferential, **not experimental**; snowball sampling; self-reported Likert buckets. Deployment frequency is a **proxy** for batch size. So "small batches correlate strongly" is established; "cause" is not | 2019 State of DevOps, methodology pp.77–78 |
+
+### Tier 2 — credible practitioner consensus, no evidence base
+
+**One walking skeleton through the state matrix, not states in isolation.** Four independent lineages
+converge: tracer bullets (Hunt & Thomas), walking skeleton (Cockburn), Shape Up scopes (Singer,
+"discovered by doing the real work"), and the Riskiest Assumption Test (Higham). Unevidenced, but as
+near unanimous as practitioner craft gets, and it matches the SWE advisor's build item 1 exactly.
+
+Feature toggles are **inventory with a carrying cost** (Hodgson/Fowler): mitigate with removal tasks,
+expiry dates, hard caps. Preview-deploy-per-PR has an obvious mechanism, **literally no evidence**,
+and near-zero cost.
+
+### Tier 3 — folklore, or claims that failed checking
+
+| claim | verdict |
+|---|---|
+| **Deep links / URL state as a feedback multiplier** | **Folklore.** No study, no benchmark, no engineering post. Nielsen's *URL as UI* (1999) is about document addressing on the pre-search-engine web, not application state. The mechanism is real and worth doing; **argue it from first principles, never from a citation** |
+| "Instrument analytics first or the data is lost forever" | **Defeated at v0 scale.** Heap virtual events are retroactive; PostHog autocaptures without tracking code. The defensible version: *logging is cheap and fine; treating those logs as evidence is what the statistics rule out* |
+| "Feature flags are a DORA capability" | **False.** dora.dev lists 34 capabilities, none mention flags, toggles, dark launch, or canary. **Trunk-based development** is the real one |
+| "Linear says data models are the durable artifact" | **Linear has published nothing on this.** The sync-engine material is *third-party reverse engineering*. Affects competency #15's citation, which should say so |
+| Progressive delivery = "CD with control over the blast radius" | Not in Governor's coining post. Unsourced |
+| "Under X visitors, don't A/B test" | No credible source states a hard threshold. Use Kohavi's "thousands, large effects only" instead |
+
+### The hypothesis, killed a second time — now empirically
+
+§1 retracted the AI cost-curve inversion on logic. The data points the **other way**:
+
+- **METR RCT (Jul 2025):** 16 experienced OSS devs, 246 issues, mature repos. AI-allowed condition took **19% longer**. Devs predicted a 24% speedup and still believed they got 20% afterwards.
+- **DORA 2024:** AI adoption associated with **decreased** throughput and stability. **2025:** throughput flipped positive, **stability still negative**.
+- **GitClear** (211M changed lines, 2020–2024): refactoring's share of changed lines fell 25% → under 10%; cloned lines rose 8.3% → 12.3%.
+
+And the sourced version of what actually got expensive is **verification and problem definition**, not
+schemas or state models. Saarinen: the hard part is understanding the problem well enough to know what
+should exist. Willison: writing code is cheap, review and QA are not. My schema/contract framing was
+mine alone and no source narrows with it.
+
+### Computing the path to done, what is actually available
+
+**CPM cannot be run on v0 work, and its inventors said so.** Kelley & Walker (1959) contains a
+*Non-Deterministic Schedules* section conceding that random durations pose difficulties "partly
+philosophical and partly mathematical" that "do not seem easily resolved." CPM presupposes the
+activity list, the dependency graph, and the durations. A v0 has none of the three.
+
+| available method | computes | boundary |
+|---|---|---|
+| **TOC five focusing steps** | which single constraint gates output | needs a definable goal. Goldratt: most real constraints are **policy**, not physical |
+| **CD3 / WSJF** (Cost of Delay ÷ Duration) | economically optimal sequence. Worked example: 61% less delay cost than FIFO | needs real currency on delay. Yip's critique: SAFe's Fibonacci proxies discard the economics that made it work |
+| **Monte Carlo from throughput** | a probabilistic date | needs 3+ weeks of real throughput. **A v0 has none** |
+| **Shape Up appetite + hill chart** | a fixed budget and a position, deliberately **not** a date | zero empirical validation, one company's published practice |
