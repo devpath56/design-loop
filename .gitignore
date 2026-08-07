@@ -21,3 +21,6 @@ fixtures/dead.html
 Source authority content/
 *.pdf
 *.epub
+
+# captured design references (screenshots of others work) — LOCAL study only, never commit
+.inspo/

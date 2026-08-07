@@ -25,8 +25,9 @@
     "track": "node checks/track.mjs",
     "verify-render": "node checks/verify-render.mjs",
     "doctrine": "node checks/doctrine-gate.mjs --render",
-    "test": "node checks/test-state-taxonomy.mjs && node checks/doctrine-gate.mjs --strict && node checks/loop-integrity.mjs --strict && node checks/check-selfgrade.mjs --strict && node checks/test-craft-delta.mjs && node checks/craft-controls.mjs && node checks/rule-coverage.mjs --strict && node checks/design-rat.mjs --gate --strict && node checks/teach-gate.mjs --strict && node checks/test-show.mjs && node checks/test-workbench.mjs",
-    "coverage": "node checks/rule-coverage.mjs"
+    "test": "node checks/test-state-taxonomy.mjs && node checks/doctrine-gate.mjs --strict && node checks/loop-integrity.mjs --strict && node checks/check-selfgrade.mjs --strict && node checks/test-craft-delta.mjs && node checks/craft-controls.mjs && node checks/rule-coverage.mjs --strict && node checks/design-rat.mjs --gate --strict && node checks/teach-gate.mjs --strict && node checks/test-show.mjs && node checks/test-workbench.mjs && node checks/test-inspo.mjs",
+    "coverage": "node checks/rule-coverage.mjs",
+    "inspo": "node checks/inspo.mjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.0",
