@@ -14,5 +14,12 @@ The gate suite, the house style (`design.md`), the ledgers and `docs/` stay at t
 they are shared with video-production and are referenced by 5-12 checks each. Moving them would break
 the suite and buy nothing.
 
+## References
+
+`references/awesome-design-md.md` — the core reference on `VoltAgent/awesome-design-md` (MIT), with the
+four bar-exemplar `DESIGN.md` files vendored: Linear, Vercel, Superhuman, Stripe. **Reference material,
+wired into no gate on purpose.** Read the doc's "how to use it, and how not to" before leaning on them:
+they calibrate your own reading of those systems, they do not substitute for it.
+
 Run against an artifact here:
     npm run design-gate -- ui-workbench/prototype.html --log --note "..." --why "..."
