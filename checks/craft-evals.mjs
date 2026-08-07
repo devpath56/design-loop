@@ -417,6 +417,74 @@ try {
     `${destructive.destructive} destructive control(s), ${destructive.undo} undo affordance(s)`,
     'HEURISTIC: matches verbs in labels; cannot see an undo toast that appears only after the action');
 
+  // ── 18-19. THE TWO NAMED SLOP TELLS, PROMOTED FROM PROSE TO A GATE ──────────────────
+  // design.md forbade these in words: "purple->blue gradient hero on white" and
+  // "Inter/Space-Grotesk at default weight as the safe face". A forbid in a skill file is tier D
+  // on the quality ladder — a written reminder, which decays under load and is exactly why both
+  // tells kept appearing. These are the same two rules as DETECTION, in the home that already
+  // runs on every gate and already exits non-zero, which is what makes them tier A rather than
+  // a second document.
+  //
+  // Independently corroborated: a practitioner deck naming AI-slop tells listed the same two
+  // first ("blue-purple gradients", "Inter font everywhere"). Two parties converging on the same
+  // tells is why these two are worth gating and not, say, border-radius.
+  //
+  // WHAT THIS CANNOT DO, so the tier is not overclaimed: it reads the rendered artifact, so it
+  // catches the tell that SHIPPED. It cannot stop one being written. Tier S (inexpressible) needs
+  // the constructor changed — colours and faces resolvable only from a closed token set, so an
+  // arbitrary purple ramp has no representation. That is a different build and is not this.
+  const slopTells = await page.evaluate(() => {
+    const hue = (r, g, b) => {
+      const mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn;
+      if (!d) return null;
+      let h;
+      if (mx === r) h = ((g - b) / d) % 6; else if (mx === g) h = (b - r) / d + 2; else h = (r - g) / d + 4;
+      h = h * 60; return h < 0 ? h + 360 : h;
+    };
+    const grads = [], faces = [];
+    for (const el of document.querySelectorAll('*')) {
+      const cs = getComputedStyle(el);
+      const bg = cs.backgroundImage || '';
+      const box = el.getBoundingClientRect();
+      // only a real surface counts: a 2px decorative chip is not a gradient hero
+      if (/gradient\(/.test(bg) && box.width >= 240 && box.height >= 120) {
+        const stops = [...bg.matchAll(/rgba?\(\s*(\d+)[,\s]+(\d+)[,\s]+(\d+)/g)]
+          .map((m) => hue(+m[1] / 255, +m[2] / 255, +m[3] / 255)).filter((h) => h != null);
+        // the tell is a ramp ACROSS the violet-blue band, not a single-hue tint
+        const inBand = stops.filter((h) => h >= 215 && h <= 295);
+        if (inBand.length >= 2 && Math.max(...inBand) - Math.min(...inBand) >= 12) {
+          grads.push({ tag: el.tagName.toLowerCase(), hues: inBand.map((h) => Math.round(h)),
+                       area: Math.round(box.width) + 'x' + Math.round(box.height) });
+        }
+      }
+      // the display face: biggest rendered text on the page
+      const t = (el.textContent || '').trim();
+      if (t && el.children.length === 0) {
+        const size = parseFloat(cs.fontSize) || 0;
+        if (size >= 24) faces.push({ size, family: cs.fontFamily, weight: +cs.fontWeight || 400 });
+      }
+    }
+    faces.sort((a, b) => b.size - a.size);
+    return { grads, display: faces[0] || null };
+  });
+
+  add('slop-gradient', 'no violet-to-blue gradient surface',
+    slopTells.grads.length ? 'FAIL' : 'PASS',
+    slopTells.grads.length
+      ? `${slopTells.grads.length} surface(s) ramp across the violet-blue band: ` +
+        slopTells.grads.slice(0, 3).map((g) => `${g.tag} ${g.area} hues ${g.hues.join('->')}`).join(' · ')
+      : 'no large surface ramps across hue 215-295',
+    'design.md names this tell; measured on computed background-image stops, not on source text');
+
+  const d = slopTells.display;
+  const SAFE_FACE = /(^|[",\s])(Inter|Space Grotesk|system-ui|-apple-system|BlinkMacSystemFont)/i;
+  const defaultFace = d && SAFE_FACE.test(d.family) && d.weight <= 400;
+  add('slop-default-face', 'the display face is chosen, not the safe default',
+    d ? (defaultFace ? 'FAIL' : 'PASS') : 'INFO',
+    d ? `${Math.round(d.size)}px display type: ${d.family.split(',')[0].replace(/"/g, '')} @ ${d.weight}`
+      : 'no text at 24px or larger to judge',
+    'the tell is the SAFE face at DEFAULT weight; Inter at 700, or any deliberate face, passes');
+
   await ctx.close();
 } finally {
   await browser.close();

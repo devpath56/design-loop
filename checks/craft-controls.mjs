@@ -45,6 +45,14 @@ for (const f of ['slop.html', 'clean.html']) {
   if (!fs.existsSync(fixture(f))) { check(`fixture ${f} exists`, false); }
 }
 
+// The two named slop TELLS get their own fixture pair. They are not pinned against slop.html
+// because that file never carried these defects — both checks PASSED it, which is the vacuous
+// result this file exists to catch. fixtures/slop-tells.html carries a violet->blue gradient hero
+// and Inter@400 display type on purpose, so the pins below are real.
+const TELLS = ['slop-gradient', 'slop-default-face'];
+const tells = verdicts(fixture('slop-tells.html'));
+check('craft-evals ran on the slop-tells fixture', !!tells);
+
 const slop = verdicts(fixture('slop.html'));
 const clean = verdicts(fixture('clean.html'));
 check('craft-evals ran on both fixtures', !!slop && !!clean);
@@ -56,6 +64,13 @@ if (slop && clean) {
     // positive control: the defect is absent, the check MUST NOT false-fire
     check(`${id} PASSES on clean (a check that fails here is over-eager)`, clean[id] === 'PASS');
   }
+  for (const id of TELLS) {
+    check(`${id} FAILS on slop-tells (the tell is present; passing here is vacuous)`, tells && tells[id] === 'FAIL');
+    check(`${id} PASSES on clean (a check that fails here is over-eager)`, clean[id] === 'PASS');
+    check(`${id} exists in craft-evals output (else the assertions above pass on undefined)`,
+      !!tells && Object.prototype.hasOwnProperty.call(tells, id));
+  }
+
   // meta-control: every PINNED id must actually exist in craft-evals output, or the assertions
   // above pass vacuously against `undefined !== 'FAIL'`. This is the "TARGETS covers every check"
   // guard from Trident's mutate.py, one level up.

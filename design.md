@@ -41,10 +41,13 @@ book) — lives in [`docs/competency-map.md`](docs/competency-map.md); the teach
 - **Spend boldness in one place**, keep the rest quiet.
 
 ## Anti-slop (reject the on-distribution defaults)
+> Two of these are now GATES, not reminders (marked GATED below); the rest are still tier D prose.
 > Hallmark's `audit` is the authoritative anti-slop checker (57 named gates). The reminders below are the
 > project-specific subset the loop keeps top-of-mind; let Hallmark be the gate.
-- ❌ Inter/Space-Grotesk at default weight as the "safe" face
-- ❌ purple→blue gradient hero on white · lone acid-green/vermilion pop on near-black
+- ❌ Inter/Space-Grotesk at default weight as the "safe" face — **GATED**: `craft-evals`
+  `slop-default-face` fails the display face if it is a safe stack at weight ≤400
+- ❌ purple→blue gradient hero on white — **GATED**: `craft-evals` `slop-gradient` fails any
+  surface ≥240×120 whose gradient stops ramp across hue 215–295 · lone acid-green/vermilion pop on near-black
 - ❌ cream `#F4F1EA` + serif + terracotta
 - ❌ everything centered · `rounded-lg` everywhere · emoji as section markers · accent bar on every card
 - Structural devices (numbering, eyebrows, dividers) must **encode something true**, not decorate.
