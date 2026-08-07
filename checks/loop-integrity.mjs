@@ -21,7 +21,7 @@ function assess() {
       Object.values(scripts).some((c) => /checks\/\w+\.mjs/.test(c)) && CHECKS.filter(has).length >= 4,
       'npm scripts invoke real checkers'],
     ['skill file', has('design.md') && fs.statSync('design.md').size > 200, true, 'design.md'],
-    ['maker', grepAny('hallmark', CHECKS.concat(['design.md'])) || has('effects/registry.json'), true, 'hallmark/effects'],
+    ['maker', grepAny('hallmark', CHECKS.concat(['design.md'])) || has('ui-workbench/effects/registry.json'), true, 'hallmark/effects'],
     ['checker', has('checks/design-gate.mjs') && has('checks/log-audit.mjs'),
       grepAny('spawnSync', ['checks/design-gate.mjs']) || has('checks/verify-render.mjs'), 'gate + cold audit'],
     ['gate', has('checks/design-gate.mjs'),

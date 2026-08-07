@@ -1,4 +1,4 @@
-// test-workbench — durability control for the workbench state-dropdown scraper. prototype.html has a
+// test-workbench — durability control for the workbench state-dropdown scraper. ui-workbench/prototype.html has a
 // runtime selector `[data-state="${name}"]` inside a <script> (line ~253). The workbench must scrape
 // data-state from MARKUP only; scraping scripts too pulls the literal ${name} in as a bogus state and
 // emits a dead <option value="${name}"> that breaks the state-switch (the "workbench not loading"
@@ -18,7 +18,7 @@ const check = (label, cond) => { console.log(`  ${cond ? 'ok  ' : 'FAIL'} ${labe
 console.log('== workbench: the state dropdown scrapes real states, not JS selectors ==\n');
 
 // Regenerate without the browser self-verify (WB_NOSYNC), so this stays a fast deterministic check.
-const gen = spawnSync('node', ['checks/workbench.mjs', 'prototype.html'],
+const gen = spawnSync('node', ['checks/workbench.mjs', 'ui-workbench/prototype.html'],
   { cwd: ROOT, encoding: 'utf8', env: { ...process.env, WB_NOSYNC: '1' }, timeout: 30000 });
 check('workbench regenerated', gen.status === 0 || gen.status === null || fs.existsSync(path.join(ROOT, 'workbench-prototype.html')));
 
@@ -26,7 +26,7 @@ const wb = fs.readFileSync(path.join(ROOT, 'workbench-prototype.html'), 'utf8');
 const block = (wb.match(/<select id="st"[^>]*>([\s\S]*?)<\/select>/) || [])[1] || '';
 const values = [...block.matchAll(/value="([^"]*)"/g)].map((m) => m[1]);
 
-// the exact regression: prototype.html's `[data-state="${name}"]` selector must NOT become an option
+// the exact regression: ui-workbench/prototype.html's `[data-state="${name}"]` selector must NOT become an option
 check('no ${name} template artifact leaks into the state dropdown', !wb.includes('value="${name}"'));
 check('every state option is a real state name or the empty default',
   values.length > 0 && values.every((v) => v === '' || /^[a-z][a-z0-9_-]*$/i.test(v)));

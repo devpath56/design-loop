@@ -28,6 +28,14 @@ book) — lives in [`docs/competency-map.md`](docs/competency-map.md); the teach
 - The two **stance axes** (taste↔evidence, craft↔leverage) and the four archetypes are in the map §3 —
   they are perspectives to switch between, not a competency to score.
 
+## Where the work lives
+- **`ui-workbench/`** — every screen artifact and the states it owes. `effects/` sits beside the
+  screens so their `./effects/...` links resolve with no rewriting.
+- **`video-production/`** — explainers and animation. Shares this loop's METHOD and **none** of its
+  checkers (no DOM, so contrast/target-size/state-matrix do not apply). Empty of code today.
+- **Shared, at the repo root:** this file, `docs/`, the `*.jsonl` ledgers, and `checks/`. Referenced by
+  5-12 checks each, so they do not move.
+
 ## Non-negotiables (the gate enforces these)
 - **Contrast** — body text ≥ 4.5:1, large text/UI ≥ 3:1 (WCAG AA). Light-gray-on-white is the #1 slip.
 - **Names** — every control has an accessible name (icon-only buttons need `aria-label`).

@@ -15,7 +15,7 @@ import { doctrineFragment, DOCTRINE_CSS } from './doctrine-gate.mjs';
 const argv = process.argv.slice(2);
 const urlIdx = argv.indexOf('--url');
 const explicitUrl = urlIdx !== -1 ? argv[urlIdx + 1] : null;
-const target = argv.find((a) => !a.startsWith('--') && a !== explicitUrl) || 'prototype.html';
+const target = argv.find((a) => !a.startsWith('--') && a !== explicitUrl) || 'ui-workbench/prototype.html';
 
 if (!explicitUrl && !fs.existsSync(target)) {
   console.error(`no such file: ${target}`);
@@ -34,7 +34,7 @@ const frameSrc = explicitUrl || './' + target.split(path.sep).join('/');
 // was opened as a file: a `src` iframe of a sibling renders BLANK over file:// (the opaque file
 // origin blocks the nested document load, contentDocument is null). srcdoc has no cross-file load, so
 // the design renders over file:// AND http. Two more moves make it whole:
-//   · inline external effect scripts (`<script src="./effects/..">`) — about:srcdoc cannot resolve a
+//   · inline external effect scripts (`<script src="./ui-workbench/effects/..">`) — about:srcdoc cannot resolve a
 //     relative script src, so the marble-ink / kinetic-type layers would silently not load.
 //   · rename `const show =` to `window.show =` so the state dropdown drives the stage same-origin
 //     (srcdoc inherits the parent origin) instead of a ?state reload that only works on a server.
@@ -81,7 +81,7 @@ try {
   const owed = (src.match(/<meta\s+name=["']ui-states["']\s+content=["']([^"']+)["']/i) || [])[1];
   if (owed) REQUIRED_STATES = owed.split(',').map((s) => s.trim()).filter(Boolean);
   // Scrape data-state from MARKUP only. Scripts contain runtime selectors like
-  // `[data-state="${name}"]` (prototype.html:253) — matching those pulls the literal ${name} in as a
+  // `[data-state="${name}"]` (ui-workbench/prototype.html:253) — matching those pulls the literal ${name} in as a
   // bogus state and emits a dead <option value="${name}"> that the state-switch gate then fails on.
   // Strip scripts first, and keep only real state names (state-matrix uses the same rule).
   const markup = src.replace(/<script[\s\S]*?<\/script>/gi, '');
@@ -467,7 +467,7 @@ const html = `<!doctype html>
         const wb = `workbench-${path.basename(f).replace(/\.html?$/i, '')}.html`;
         const built = fs.existsSync(wb);
         // Label by the prototype's own <title>, not its filename, so you recognise it by name
-        // ("CI for design taste") not "workflow-explainer.html". Falls back to the filename.
+        // ("CI for design taste") not "ui-workbench/workflow-explainer.html". Falls back to the filename.
         let label = f;
         try { const t = fs.readFileSync(f, 'utf8').match(/<title>([^<]+)<\/title>/i); if (t) label = t[1].trim(); } catch {}
         return `<option value="${esc(wb)}"${f === target ? ' selected' : ''}${built || f === target ? '' : ' disabled'} title="${esc(f)}">${esc(label)}${built || f === target ? '' : ': no workbench yet'}</option>`;

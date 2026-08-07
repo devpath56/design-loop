@@ -13,7 +13,7 @@
 // `evidence` row actually evidence, or a restatement of `mechanism`?) — that is semantic, and
 // it belongs to the cold auditor, not here.
 //
-// Usage:  node checks/verify-render.mjs [--target prototype.html]
+// Usage:  node checks/verify-render.mjs [--target ui-workbench/prototype.html]
 import { chromium } from 'playwright';
 import path from 'node:path';
 import { spawnSync, spawn } from 'node:child_process';
@@ -23,7 +23,7 @@ import { load, pairSteps, AXES } from './lib/runs.mjs';
 
 const argv = process.argv.slice(2);
 const tIdx = argv.indexOf('--target');
-const target = tIdx !== -1 ? argv[tIdx + 1] : 'prototype.html';
+const target = tIdx !== -1 ? argv[tIdx + 1] : 'ui-workbench/prototype.html';
 const wb = `workbench-${path.basename(target).replace(/\.html?$/i, '')}.html`;
 
 if (!fs.existsSync(wb)) {
